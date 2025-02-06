@@ -15,8 +15,8 @@ app.use(cookieParser());
 app.use(cors(
     {
         origin: [
-            'http://localhost:3000',
-            'http://localhost:3100'
+            'http://web.jokeped.xyz:3000',
+            'http://web.jokeped.xyz:3100'
         ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
