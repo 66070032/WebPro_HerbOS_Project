@@ -14,10 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors(
     {
-        origin: [
-            'https://web.jokeped.xyz:3000',
-            'https://web.jokeped.xyz:3100'
-        ],
+        origin: '*',
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
     }
@@ -71,6 +68,7 @@ connection();
 
 app.get('/', async (req, res) => {
     const [row, fields] = await db.execute('SELECT * FROM users');
+    console.log("Enter.")
     res.send(row);
 });
 
