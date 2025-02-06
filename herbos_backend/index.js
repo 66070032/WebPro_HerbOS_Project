@@ -53,8 +53,8 @@ async function connection() {
         console.clear();
         console.log(`${chalk.blue('[INFO]')} Database connect ${chalk.green('successfully')}`);
 
-        app.listen(3000, () => {
-            console.log(`${chalk.blue('[INFO]')} API Server locate at ${chalk.green(`http://localhost:${3000}`)}`);
+        app.listen(3100, () => {
+            console.log(`${chalk.blue('[INFO]')} API Server locate at ${chalk.green(`http://localhost:${3100}`)}`);
         });
 
         return db;
