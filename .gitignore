@@ -1,0 +1,3 @@
+/herbos_backend/node_modules
+/herbos_frontend/node_modules
+.env
