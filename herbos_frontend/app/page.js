@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        let response = await fetch("https://web.api.jokeped.xyz:3100/");
+        let response = await fetch("https://web.api.jokeped.xyz/");
         const result = await response.json();
         setUsers(result);
       } catch (error) {
