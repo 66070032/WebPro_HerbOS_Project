@@ -13,7 +13,10 @@ app.use(cookieParser());
 app.set("trust proxy", 1);
 app.use(cors(
     {
-        origin: '*',
+        origin: [
+            'https://web.jokeped.xyz',
+            'https://web.api.jokeped.xyz'
+        ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true
     }
