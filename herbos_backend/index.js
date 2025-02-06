@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 import express from 'express';
 import cors from 'cors';
 import mysql from 'mysql2/promise';
@@ -55,8 +53,8 @@ async function connection() {
         console.clear();
         console.log(`${chalk.blue('[INFO]')} Database connect ${chalk.green('successfully')}`);
 
-        app.listen(config.API_PORT, () => {
-            console.log(`${chalk.blue('[INFO]')} API Server locate at ${chalk.green(`http://localhost:${config.API_PORT}`)}`);
+        app.listen(3000, () => {
+            console.log(`${chalk.blue('[INFO]')} API Server locate at ${chalk.green(`http://localhost:${3000}`)}`);
         });
 
         return db;
