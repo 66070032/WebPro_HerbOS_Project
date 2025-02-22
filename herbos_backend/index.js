@@ -28,6 +28,19 @@ app.get('/', (req, res) => {
     res.send("HerbOS Backend API");
 });
 
+app.get('/users', async (req, res) => {
+    const connection = await pool.getConnection();
+    try {
+        const [rows] = await connection.query('SELECT * FROM users');
+        res.json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    } finally {
+        connection.release();
+    }
+});
+
 try {
     console.clear();
     await pool.getConnection();
