@@ -32,8 +32,8 @@ try {
     console.clear();
     await pool.getConnection();
     console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Database connected`);
-    app.listen(3100, () => {
-        console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Server is running on port ${chalk.greenBright('3000')}`);
+    app.listen(PORT, () => {
+        console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Server is running on port ${chalk.greenBright(PORT)}`);
         pool.releaseConnection();
     })
 } catch (error) {
