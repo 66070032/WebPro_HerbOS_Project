@@ -25,7 +25,7 @@ export default function Home() {
       <div>
         {users.length > 0 ? (
           users.map((item, index) => (
-            <div key={index}> {/* Ensure a unique key */}
+            <div key={index}>
               <p>{item.username}</p>
               <p>{item.email}</p>
               <p>{item.password}</p>
