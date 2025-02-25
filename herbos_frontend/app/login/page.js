@@ -3,6 +3,11 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
 
+    let accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+        window.location.href = "/";
+    }
+
     const router = useRouter();
 
     const handleSubmit = async (e) => {
