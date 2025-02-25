@@ -1,6 +1,18 @@
 "use client"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { fetchWithAuth } from "../utils/auth";
 
 export default function Register() {
+
+    const router = useRouter();
+
+    useEffect(() => {
+        let accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+            router.push("/")
+        }
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,7 +34,7 @@ export default function Register() {
                 return alert(result.message)
             }
 
-            window.location.href = '/login'
+            router.push('/login')
 
         } catch (error) {
             console.error("❌ Login Failed:", error);

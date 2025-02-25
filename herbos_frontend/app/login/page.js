@@ -4,14 +4,14 @@ import { useEffect } from "react";
 
 export default function Home() {
 
+    const router = useRouter();
+
     useEffect(() => {
         let accessToken = localStorage.getItem("accessToken");
         if (accessToken) {
-            window.location.href = "/";
+            router.push('/');
         }
     }, []);
-
-    const router = useRouter();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
