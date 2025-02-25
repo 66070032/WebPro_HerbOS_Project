@@ -41,6 +41,8 @@ const generateUserSecretKey = () => {
 
 app.post('/register', async (req, res) => {
     const userData = {
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
         username: req.body.username,
         email: req.body.email,
         password: req.body.password
@@ -58,7 +60,7 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(userData.password, 10);
         const userSecretKey = generateUserSecretKey();
 
-        await connection.query('INSERT INTO users (username, email, password, secret_key) VALUES (?, ?, ?, ?)', [userData.username, userData.email, hashedPassword, userSecretKey]);
+        await connection.query('INSERT INTO users (username, firstname, lastname, email, password, secret_key) VALUES (?, ?, ?, ?, ?, ?)', [userData.username, userData.firstname, userData.lastname,userData.email, hashedPassword, userSecretKey]);
         connection.release();
 
         res.json({ message: "User registered successfully" });
