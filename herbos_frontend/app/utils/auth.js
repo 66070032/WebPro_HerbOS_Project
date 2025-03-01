@@ -11,7 +11,6 @@ export const fetchWithAuth = async (url, options = {}) => {
     let response = await fetch(url, { ...options, headers });
 
     if (response.status === 401) { // ❌ ถ้า Token หมดอายุ
-        console.log("🔄 Token expired. Logging out...");
         localStorage.removeItem("accessToken");
         window.location.href = "/login";
         return;

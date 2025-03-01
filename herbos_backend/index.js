@@ -154,12 +154,20 @@ app.post('/logout', (req, res) => {
 try {
     console.clear();
     await pool.getConnection();
+    console.log(`
+    ██╗  ██╗███████╗██████╗ ██████╗  ██████╗ ███████╗     █████╗ ██████╗ ██╗
+    ██║  ██║██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔════╝    ██╔══██╗██╔══██╗██║
+    ███████║█████╗  ██████╔╝██████╔╝██║   ██║███████╗    ███████║██████╔╝██║
+    ██╔══██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║╚════██║    ██╔══██║██╔═══╝ ██║
+    ██║  ██║███████╗██║  ██║██████╔╝╚██████╔╝███████║    ██║  ██║██║     ██║
+    ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
+    `);
     console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Database connected`);
     app.listen(PORT, () => {
         console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Server is running on port ${chalk.greenBright(PORT)}`);
         pool.releaseConnection();
     });
 } catch (error) {
-    console.log(chalk.red(error));
+    console.log(`${chalk.red('[ERROR]')} [${new Date().toLocaleString()}] ${error}`);
     process.exit(1);
 }
