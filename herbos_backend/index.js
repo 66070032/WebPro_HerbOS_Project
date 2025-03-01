@@ -104,6 +104,12 @@ app.post('/login', async (req, res) => {
     }
 });
 
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+//////////////   Need authen to access   //////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
 const verifyToken = async (req, res, next) => {
     const token = req.headers["authorization"]?.split(" ")[1];
 
@@ -138,7 +144,6 @@ app.get('/profile', verifyToken, async (req, res) => {
         if (user.length === 0) {
             return res.status(404).json({ message: "User not found" });
         }
-
         res.json(user[0]);
     } catch (error) {
         console.error(error);
@@ -151,15 +156,29 @@ app.post('/logout', (req, res) => {
     res.json({ message: "Logged out successfully" });
 });
 
+app.post('/addcart', verifyToken, async (req, res) => {
+    let data = await jwt.decode(req.body.refreshToken);
+    console.log(data)
+    res.send(data)
+});
+
 try {
     console.clear();
     await pool.getConnection();
+    console.log(`
+    ██╗  ██╗███████╗██████╗ ██████╗  ██████╗ ███████╗     █████╗ ██████╗ ██╗
+    ██║  ██║██╔════╝██╔══██╗██╔══██╗██╔═══██╗██╔════╝    ██╔══██╗██╔══██╗██║
+    ███████║█████╗  ██████╔╝██████╔╝██║   ██║███████╗    ███████║██████╔╝██║
+    ██╔══██║██╔══╝  ██╔══██╗██╔══██╗██║   ██║╚════██║    ██╔══██║██╔═══╝ ██║
+    ██║  ██║███████╗██║  ██║██████╔╝╚██████╔╝███████║    ██║  ██║██║     ██║
+    ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝    ╚═╝  ╚═╝╚═╝     ╚═╝
+    `);
     console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Database connected`);
     app.listen(PORT, () => {
         console.log(`${chalk.blue('[INFO]')} [${new Date().toLocaleString()}] Server is running on port ${chalk.greenBright(PORT)}`);
         pool.releaseConnection();
     });
 } catch (error) {
-    console.log(chalk.red(error));
+    console.log(`${chalk.red('[ERROR]')} [${new Date().toLocaleString()}] ${error}`);
     process.exit(1);
 }

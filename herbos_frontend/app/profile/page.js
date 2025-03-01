@@ -17,7 +17,6 @@ export default function Dashboard() {
         });
         localStorage.removeItem("accessToken");
         router.push("/login");
-        console.log(response);
     };
     useEffect(() => {
         const getUserData = async () => {
