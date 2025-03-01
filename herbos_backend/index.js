@@ -104,6 +104,12 @@ app.post('/login', async (req, res) => {
     }
 });
 
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+//////////////   Need authen to access   //////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+
 const verifyToken = async (req, res, next) => {
     const token = req.headers["authorization"]?.split(" ")[1];
 
@@ -138,7 +144,6 @@ app.get('/profile', verifyToken, async (req, res) => {
         if (user.length === 0) {
             return res.status(404).json({ message: "User not found" });
         }
-
         res.json(user[0]);
     } catch (error) {
         console.error(error);
@@ -149,6 +154,12 @@ app.get('/profile', verifyToken, async (req, res) => {
 app.post('/logout', (req, res) => {
     res.clearCookie("refreshToken");
     res.json({ message: "Logged out successfully" });
+});
+
+app.post('/addcart', verifyToken, async (req, res) => {
+    let data = await jwt.decode(req.body.refreshToken);
+    console.log(data)
+    res.send(data)
 });
 
 try {
