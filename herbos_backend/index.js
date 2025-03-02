@@ -38,7 +38,17 @@ app.use((req, res, next) => {
 const generateUserSecretKey = () => {
     return crypto.randomBytes(64).toString('hex');
 };
-
+app.get('/viewproduct', async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('SELECT * FROM products');
+        connection.release();
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Database query error' });
+    }
+});
 app.post('/register', async (req, res) => {
     const userData = {
         firstname: req.body.firstname,
@@ -161,6 +171,8 @@ app.post('/addcart', verifyToken, async (req, res) => {
     console.log(data)
     res.send(data)
 });
+
+
 
 try {
     console.clear();
