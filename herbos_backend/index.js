@@ -114,6 +114,18 @@ app.post('/login', async (req, res) => {
     }
 });
 
+app.get('/products', async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('SELECT * FROM products');
+        connection.release();
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 //////////////   Need authen to access   //////////////////////
