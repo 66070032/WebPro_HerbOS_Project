@@ -17,7 +17,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="relative max-w-screen h-screen bg-amber-100">
+    <div className="relative max-w-screen min-h-screen bg-amber-100">
       <Navbar />
       <div className="flex flex-col mt-14 md:flex-row items-center justify-center text-center">
         <div className="flex flex-col md:w-1/2">
@@ -28,7 +28,7 @@ export default function Dashboard() {
           <div className="flex justify-center mt-6">
             <Link 
               className="px-8 py-4 text-xl font-semibold text-gray-800 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-100 hover:border-gray-500"
-              href="/"
+              href="/viewproduct"
             >
               สินค้าทั้งหมด
             </Link>

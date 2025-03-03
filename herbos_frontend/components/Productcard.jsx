@@ -12,7 +12,7 @@ const Productcard = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-36 justify-items-cente">
       {products.map((product) => (
         <div key={product.id} className="max-w-xs h-96 bg-white shadow-lg rounded-2xl overflow-hidden">
           <img src={product.images} alt={product.name} className="w-full h-48 object-cover" />
@@ -23,8 +23,10 @@ const Productcard = () => {
               <span className="text-xl font-bold text-blue-500">{product.price} บาท</span>
               <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
                 Add to Cart
+              
               </button>
             </div>
+
           </div>
         </div>
       ))}

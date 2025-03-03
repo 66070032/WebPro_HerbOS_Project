@@ -9,8 +9,11 @@ const product = () => {
   return (
     <div className="w-full">
         <Navbar />
-        <h1 className="">หมวดหมู่สินค้า</h1>
-        <Productcard />
+        <h1 className="text-3xl text-center">หมวดหมู่สินค้า</h1>
+        <div className="flex justify-center items-center min-h-screen w-full">
+          <Productcard />
+        </div>
+
 
     </div>
   )
