@@ -126,6 +126,30 @@ app.get('/products', async (req, res) => {
     }
 })
 
+app.get('/category', async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('SELECT * FROM category');
+        connection.release();
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
+app.get('/selFromCategory', async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('SELECT * FROM products WHERE category_id = ?', [req.body.category]);
+        connection.release();
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 //////////////   Need authen to access   //////////////////////
@@ -183,8 +207,6 @@ app.post('/addcart', verifyToken, async (req, res) => {
     console.log(data)
     res.send(data)
 });
-
-
 
 try {
     console.clear();
