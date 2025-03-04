@@ -128,6 +128,25 @@ app.get('/products', async (req, res) => {
     }
 })
 
+app.get('/products/:id', async (req, res) => {
+    const productId = req.params.id;
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('SELECT * FROM products WHERE id = ?', [productId]);
+        connection.release();
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        res.json(results[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+
 app.get('/category', async (req, res) => {
     try {
         const connection = await pool.getConnection();
