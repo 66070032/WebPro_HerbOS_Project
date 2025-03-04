@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link";
 import Cart from "./Cart";
+import { CircleUser } from "lucide-react";
 import { useState } from "react";
 
 const Navbar = () => {
@@ -57,6 +58,11 @@ const Navbar = () => {
             </li>
             <li>
                 <Cart />
+            </li>
+            <li>
+              <a href="/profile">
+                <CircleUser />
+              </a>
             </li>
           </ul>
         </div>

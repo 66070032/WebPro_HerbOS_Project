@@ -218,6 +218,21 @@ app.get('/profile', verifyToken, async (req, res) => {
     }
 });
 
+app.put('/profile/update', verifyToken, async (req, res) => {
+    const { username, email, phone } = req.body;
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.query('UPDATE users SET username = ?, email = ?, phone = ? WHERE id = ?', [username, email, phone, req.user.userId]);
+        connection.release();
+
+        res.json({ message: "Profile updated successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 app.post('/logout', (req, res) => {
     res.clearCookie("refreshToken");
     res.json({ message: "Logged out successfully" });

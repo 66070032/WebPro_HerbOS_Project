@@ -1,33 +1,8 @@
-"use client";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { fetchWithAuth } from "../utils/auth";
+
+import Profile from "../../components/ProfileHead";
 
 export default function Dashboard() {
-    const [user, setUser] = useState(null);
-
-    const router = useRouter();
-
-    
-    const logout = async () => {
-        const response = await fetch("http://localhost:3100/logout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include"
-        });
-        localStorage.removeItem("accessToken");
-        router.push("/login");
-    };
-    useEffect(() => {
-        const getUserData = async () => {
-            const data = await fetchWithAuth("http://localhost:3100/profile");
-            setUser(data);
-        };
-
-        getUserData();
-    }, []);
-
-    return (
+    /* Profile Section
         <div>
             <h1>Dashboard</h1>
             {user && (
@@ -39,5 +14,17 @@ export default function Dashboard() {
                 </div>
             )}
         </div>
+    */
+    return (
+        <div className="flex min-h-screen">
+            < Profile />
+            <div className=" w-full text-center flex justify-center flex-col items-center p-10">
+                <h1 className="text-2xl font-semibold text-center text-blue-600 mb-6">
+                    โปรไฟล์
+                </h1>
+                <p>รอแปป</p>
+            </div>
+        </div>
+
     );
 }
