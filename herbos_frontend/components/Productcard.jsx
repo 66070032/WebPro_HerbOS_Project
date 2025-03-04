@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "../app/utils/auth";
 
 const Productcard = () => {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,18 @@ const Productcard = () => {
       .catch((err) => console.error('Error:', err));
   }, []);
 
+  const handleAddToCart = async (product) => {
+    // Add the product to the cart
+    const user = await fetchWithAuth("http://localhost:3100/profile");
+    const result = await fetchWithAuth("http://localhost:3100/addcart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ username: user.username, product_id: product.id })
+    })
+    alert('เพิ่มสินค้าลงตะกร้าเรียบร้อย')
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-36 justify-items-cente">
       {products.map((product) => (
@@ -21,9 +34,8 @@ const Productcard = () => {
             <p className="text-gray-500 text-sm">{product.description}</p>
             <div className="mt-2 flex justify-between items-center">
               <span className="text-xl font-bold text-blue-500">{product.price} บาท</span>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
+              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition" type="button" onClick={() => handleAddToCart(product)}>
                 Add to Cart
-              
               </button>
             </div>
 

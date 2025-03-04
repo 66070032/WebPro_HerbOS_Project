@@ -23,10 +23,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
     origin: [
-        'http://localhost:3000'
+        'http://localhost:3000',
+        'http://localhost:3100'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use((req, res, next) => {
@@ -203,9 +205,15 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/addcart', verifyToken, async (req, res) => {
-    let data = await jwt.decode(req.body.refreshToken);
-    console.log(data)
-    res.send(data)
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('INSERT INTO user_cart (username, product_id) VALUES (?, ?)', [req.user.username, req.body.product_id]);
+        connection.release();
+        res.status(200).json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 });
 
 try {
