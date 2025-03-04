@@ -216,6 +216,18 @@ app.post('/addcart', verifyToken, async (req, res) => {
     }
 });
 
+app.get('/allCart', verifyToken, async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const [results] = await connection.query('SELECT * FROM user_cart WHERE username = ?', [req.user.username]);
+        connection.release();
+        res.json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+})
+
 try {
     console.clear();
     await pool.getConnection();

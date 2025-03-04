@@ -1,12 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Minus, Plus, ShoppingBag } from "lucide-react"
+import {fetchWithAuth} from "../app/utils/auth"
 
 export default function Cart() {
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const productPrice = 99;
+
+  useEffect(() => {
+    incrementQuantity();
+  }, []);
+
+  const incrementQuantity = async() => {
+    const result = await fetchWithAuth("http://localhost:3100/allCart", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+    setQuantity(result.length);
+  };
 
   // ฟังก์ชันเปิด/ปิดการแสดงตะกร้า
   const toggleCartVisibility = () => {
