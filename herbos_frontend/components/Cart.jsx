@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react"
 import { Minus, Plus, ShoppingBag } from "lucide-react"
 import {fetchWithAuth} from "../app/utils/auth"
+import { useRouter } from "next/navigation"
 
 export default function Cart() {
   const [quantity, setQuantity] = useState(0);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const productPrice = 99;
+  const router = useRouter();
 
   useEffect(() => {
     incrementQuantity();
@@ -25,6 +27,16 @@ export default function Cart() {
   // ฟังก์ชันเปิด/ปิดการแสดงตะกร้า
   const toggleCartVisibility = () => {
     setIsCartVisible(!isCartVisible);
+  };
+
+  //ไปหน้าชำระเงิน
+  const handlePayment = () => {
+    router.push('/purchase', { 
+      state: { 
+        quantity: quantity,
+        totalPrice: productPrice * quantity 
+      } 
+    });
   };
 
   return (
@@ -76,7 +88,7 @@ export default function Cart() {
 
             {/* ปุ่มชำระเงิน */}
             <div className="mt-6">
-              <button className="w-full">ชำระเงิน</button>
+              <button onClick={handlePayment} className="w-full bg-blue-500 rounded-lg hover:bg-blue-600 text-white">ชำระเงิน</button>
             </div>
 
             {/* ปุ่มปิดตะกร้า */}
