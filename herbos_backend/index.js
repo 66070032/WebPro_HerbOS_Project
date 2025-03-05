@@ -249,6 +249,20 @@ app.post('/addcart', verifyToken, async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
+app.post('/addproduct', verifyToken, async (req, res) => {
+    try {
+        const { name, description, price, stock, category_id, images } = req.body;
+        const [results] = await connection.query('INSERT INTO products (name, description, price, stock, category_id, images) VALUES (?, ?, ?, ?, ?, ?)', 
+            [name, description, price, stock, category_id, images]
+        );
+        connection.release();
+        res.status(200).json(results);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
 
 app.get('/allCart', verifyToken, async (req, res) => {
     try {
