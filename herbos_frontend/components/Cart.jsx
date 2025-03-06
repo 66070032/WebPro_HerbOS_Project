@@ -1,99 +1,279 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Minus, Plus, ShoppingBag } from "lucide-react"
-import {fetchWithAuth} from "../app/utils/auth"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react";
+import { ShoppingBag, Plus, Minus, Trash2 } from "lucide-react";
+import { fetchWithAuth } from "../app/utils/auth";
+import { useRouter } from "next/navigation";
 
 export default function Cart() {
-  const [quantity, setQuantity] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [subTotal, setSubTotal] = useState(0);
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const productPrice = 99;
+  const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    incrementQuantity();
+    updateCart();
   }, []);
 
-  const incrementQuantity = async() => {
-    const result = await fetchWithAuth("http://localhost:3100/allCart", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
-    setQuantity(result.length);
+  const updateCart = async () => {
+    try {
+      const [cartResult, productsData] = await Promise.all([
+        fetchWithAuth("http://localhost:3100/allCart", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }),
+        fetch("http://localhost:3100/products").then((res) => res.json()),
+      ]);
+
+      // จัดกลุ่มสินค้าในตะกร้าตาม product_id
+      const groupedItems = cartResult.reduce((acc, cartItem) => {
+        const existingItem = acc.find(
+          (item) => item.product_id === cartItem.product_id
+        );
+
+        if (existingItem) {
+          // เพิ่มจำนวนหากสินค้ามีอยู่แล้ว
+          existingItem.quantity = (existingItem.quantity || 1) + 1;
+          existingItem.cart_ids = [
+            ...(existingItem.cart_ids || []),
+            cartItem.id,
+          ];
+        } else {
+          // ถ้าไม่มีให้เพิ่มอันใหม่ค่าเริ่มที่ 1
+          acc.push({
+            ...cartItem,
+            quantity: 1,
+            cart_ids: [cartItem.id],
+          });
+        }
+
+        return acc;
+      }, []);
+
+      // ประมวลผลสินค้าในตะกร้าที่จัดกลุ่มแล้วและจับคู่กับข้อมูลสินค้า
+      const processedCartItems = groupedItems.map((cartItem) => {
+        const matchedProduct = productsData.find(
+          (p) => p.id === cartItem.product_id
+        );
+
+        if (matchedProduct) {
+          return {
+            ...cartItem,
+            name: matchedProduct.name,
+            price: matchedProduct.price,
+          };
+        }
+        return cartItem;
+      });
+
+      setCartItems(processedCartItems);
+
+      // จำนวนสินค้า
+      const totalQty = processedCartItems.reduce((sum, item) => {
+        return sum + (item.quantity || 1);
+      }, 0);
+
+      setTotalQuantity(totalQty);
+
+      // ราคาสินค้าทั้งหมด
+      const total = processedCartItems.reduce((sum, item) => {
+        return sum + (item.price || 0) * (item.quantity || 1);
+      }, 0);
+
+      setSubTotal(total);
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
+
+  // เพิ่มจำนวนสินค้า
+  const increaseQuantity = async (productId) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
+    
+    try {
+      // เพิ่มสินค้าในตะกร้า - URL ผิด มี / เกินมา
+      await fetchWithAuth("http://localhost:3100/addcart", { // แก้จาก //addproduct เป็น /addcart
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ product_id: productId }),
+      });
+      
+      // อัพเดทข้อมูลตะกร้า
+      await updateCart();
+    } catch (err) {
+      console.error("Error increasing quantity:", err);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // ลดจำนวนสินค้า
+  const decreaseQuantity = async (item) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
+
+    try {
+      if (item.quantity <= 1) {
+        // ถ้าเหลือชิ้นเดียวให้ลบออกจากตะกร้า
+        await removeItem(item);
+      } else {
+        // ลบสินค้าออก 1 ชิ้น (ลบรายการแรกในตะกร้า)
+        const cartIdToRemove = item.cart_ids[item.cart_ids.length - 1];
+
+        await fetchWithAuth(`http://localhost:3100/cart/${cartIdToRemove}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        // อัพเดทข้อมูลตะกร้า
+        await updateCart();
+      }
+    } catch (err) {
+      console.error("Error decreasing quantity:", err);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // ลบสินค้าออกจากตะกร้าทั้งหมด
+  const removeItem = async (item) => {
+    if (isUpdating) return;
+    setIsUpdating(true);
+
+    try {
+      // ลบสินค้าทั้งหมดที่มี product_id เดียวกัน
+      const deletePromises = item.cart_ids.map((cartId) =>
+        fetchWithAuth(`http://localhost:3100/cart/${cartId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      // อัพเดทข้อมูลตะกร้า
+      await updateCart();
+    } catch (err) {
+      console.error("Error removing item:", err);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   // ฟังก์ชันเปิด/ปิดการแสดงตะกร้า
   const toggleCartVisibility = () => {
+    updateCart(); // อัพเดทข้อมูลตะกร้าก่อนแสดง
     setIsCartVisible(!isCartVisible);
   };
 
   //ไปหน้าชำระเงิน
   const handlePayment = () => {
-    router.push('/purchase', { 
-      state: { 
-        quantity: quantity,
-        totalPrice: productPrice * quantity 
-      } 
-    });
+    router.push("/purchase");
   };
 
   return (
     <div>
       {/* ปุ่มแสดงตะกร้า */}
       <button onClick={toggleCartVisibility} className="relative">
-        <ShoppingBag className="h-6 w-6" />
+        <ShoppingBag className="h-6 w-6 text-white hover:text-blue-500" />
         <span className="absolute top-0 right-0 h-4 w-4 rounded-full bg-red-500 text-xs text-white flex items-center justify-center">
-          {quantity}
+          {totalQuantity}
         </span>
       </button>
 
       {/* การแสดงตะกร้าเมื่อ isCartVisible เป็น true */}
       {isCartVisible && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-gray-700 bg-opacity-50 z-10 flex justify-center items-center">
-          <div className="bg-white p-4 w-96 rounded-lg">
+          <div className="bg-white p-4 w-96 rounded-lg max-h-[80vh] overflow-y-auto">
             <h2 className="text-xl font-semibold">ตะกร้าสินค้า</h2>
-            <div className="mt-4 flex items-center justify-between">
-              <div className="flex-1">
-                <p className="font-semibold">ชื่อสินค้า</p>
-                <p className="text-gray-500">฿{productPrice}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="w-6 text-center">{quantity}</span>
-                <button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setQuantity(quantity + 1)}
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
 
-            {/* ยอดรวม */}
-            <div className="mt-4 flex justify-between">
-              <span>ยอดรวม</span>
-              <span>฿{productPrice * quantity}</span>
+            {/* รายการสินค้า */}
+            {cartItems.length > 0 ? (
+              <div className="mt-4">
+                {cartItems.map((item, index) => (
+                  <div
+                    key={index}
+                    className="p-2 border-b flex justify-between"
+                  >
+                    <div className="flex-1">
+                      <p className="font-semibold">
+                        {item.name || `สินค้า #${item.product_id}`}
+                      </p>
+                      <p className="text-gray-600">฿{item.price || 0}</p>
+                    </div>
+
+                    {/* ปุ่มเพิ่ม/ลดจำนวน */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => removeItem(item)}
+                        className="text-red-500 hover:text-red-700"
+                        disabled={isUpdating}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => decreaseQuantity(item)}
+                        className="bg-gray-200 hover:bg-gray-300 rounded-full h-6 w-6 flex items-center justify-center"
+                        disabled={isUpdating}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <span className="w-8 text-center">
+                        {item.quantity || 1}
+                      </span>
+                      <button
+                        onClick={() => increaseQuantity(item.product_id)}
+                        className="bg-gray-200 hover:bg-gray-300 rounded-full h-6 w-6 flex items-center justify-center"
+                        disabled={isUpdating}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-4 text-center py-4">
+                <p>ไม่มีสินค้าในตะกร้า</p>
+              </div>
+            )}
+
+            {/* สรุปราคา */}
+            <div className="mt-4 border-t pt-4">
+              <div className="flex justify-between text-lg">
+                <span>จำนวนสินค้า</span>
+                <span>{totalQuantity} ชิ้น</span>
+              </div>
+              <div className="flex justify-between mt-2 font-bold text-lg">
+                <span>ยอดรวม</span>
+                <span>฿{subTotal}</span>
+              </div>
             </div>
 
             {/* ปุ่มชำระเงิน */}
             <div className="mt-6">
-              <button onClick={handlePayment} className="w-full bg-blue-500 rounded-lg hover:bg-blue-600 text-white">ชำระเงิน</button>
+              <button
+                onClick={handlePayment}
+                className="w-full bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600"
+                disabled={cartItems.length === 0}
+              >
+                ชำระเงิน
+              </button>
             </div>
 
             {/* ปุ่มปิดตะกร้า */}
             <div className="mt-4 text-center">
-              <button onClick={() => setIsCartVisible(false)} variant="outline">
+              <button
+                onClick={() => setIsCartVisible(false)}
+                className="text-gray-600 hover:text-gray-800"
+              >
                 ปิด
               </button>
             </div>

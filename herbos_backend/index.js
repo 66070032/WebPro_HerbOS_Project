@@ -147,6 +147,7 @@ app.post("/login", async (req, res) => {
 app.get("/products", async (req, res) => {
   try {
     const connection = await pool.getConnection();
+<<<<<<< HEAD
     const [results] = await connection.query(`
       SELECT 
         products.*, 
@@ -156,6 +157,9 @@ app.get("/products", async (req, res) => {
         ON products.category_id = category.id
     `);
 
+=======
+    const [results] = await connection.query("SELECT * FROM products");
+>>>>>>> 4aed6e105a7fa00c4a2783b5fe0f2f38aa00adba
     connection.release();
     res.json(results);
   } catch (err) {
@@ -305,11 +309,20 @@ app.post("/addcart", verifyToken, async (req, res) => {
 });
 app.post("/addproduct", verifyToken, async (req, res) => {
   try {
+<<<<<<< HEAD
     const {shop, name, description, price, stock, category_id, images } = req.body;
     const [results] = await connection.query(
       "INSERT INTO products (shop, name, description, price, stock, category_id, images) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [shop, name, description, price, stock, category_id, images]
     );
+=======
+    const { name, description, price, stock, category_id, images } = req.body;
+    const [results] = await connection.query(
+      "INSERT INTO products (name, description, price, stock, category_id, images) VALUES (?, ?, ?, ?, ?, ?)",
+      [name, description, price, stock, category_id, images]
+    );
+    const connection = await pool.getConnection();
+>>>>>>> 4aed6e105a7fa00c4a2783b5fe0f2f38aa00adba
     connection.release();
     res.status(200).json(results);
   } catch (err) {
@@ -318,6 +331,24 @@ app.post("/addproduct", verifyToken, async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
+=======
+app.delete("/cart/:id", verifyToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      "DELETE FROM user_cart WHERE id = ? AND username = ?",
+      [req.params.id, req.user.username]
+    );
+    connection.release();
+    res.status(200).json({ message: "Cart item removed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+>>>>>>> 4aed6e105a7fa00c4a2783b5fe0f2f38aa00adba
 app.get("/allCart", verifyToken, async (req, res) => {
   try {
     const connection = await pool.getConnection();

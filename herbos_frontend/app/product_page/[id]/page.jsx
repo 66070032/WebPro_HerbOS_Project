@@ -23,11 +23,11 @@ const product_page = () => {
       <div className="w-full">
         <Navbar/>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-24 max-w-7xl mx-auto bg-white p-6 shadow-lg rounded-2xl">
-        <div className="w-full md:w-1/2">
+        <div className="w-full h-80 flex items-center justify-center">
           <img
             src={product.images}
             alt={product.name}
-            className="w-full h-auto rounded-lg shadow-md"
+            className="w-full h-full object-contain"
           />
         </div>
         <div className="w-full md:w-1/2 flex flex-col gap-4">
