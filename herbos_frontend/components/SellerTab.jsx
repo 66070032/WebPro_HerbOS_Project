@@ -61,7 +61,7 @@ const SellerSidebar = () => {
               className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
             >
               <CreditCard className="mr-3" />
-              <span>การชำระเงิน</span>
+              <span>สถานะการชำระเงิน</span>
             </Link>
           </li>
 

@@ -51,7 +51,7 @@ export default function EditProfile() {
     return (
       <div className="flex min-h-screen">
         {/* Sidebar (ProfileNavbar) */}
-        <div className="w-1/4 min-h-screen bg-gray-100">
+        <div className="min-h-screen">
           <Profile />
         </div>
   

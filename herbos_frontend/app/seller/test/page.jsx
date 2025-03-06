@@ -1,22 +1,19 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import SellerTab from "../../../components/SellerTab";
-import { Package, ShoppingCart, BarChart } from "lucide-react";
-import StatCard from "../../../components/StatCard"; // สมมติว่า StatCard คือคอมโพเนนต์ที่ใช้แสดงข้อมูล
+import StatCard from "../../../components/StatCard";
+import { Package, ShoppingCart, BarChart} from "lucide-react";
 
 const Seller = () => {
-  const [products, setProducts] = useState([]); // ประกาศสถานะของสินค้า
+  const [products, setProducts] = useState([]);
   
-  // ดึงข้อมูลสินค้าจาก API หรือแหล่งข้อมูล
   useEffect(() => {
-    // ตัวอย่างการดึงข้อมูลสินค้า (แค่สมมติ)
-    const fetchProducts = async () => {
-      const res = await fetch("/api/products"); // URL ของ API ที่จะดึงข้อมูล
-      const data = await res.json();
-      setProducts(data); // เก็บข้อมูลสินค้าใน state
-    };
-    
-    fetchProducts();
+      fetch('http://localhost:3100/products')
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error('Error:', err));
   }, []);
+
 
   // คำนวณค่าต่างๆ
   const totalProducts = products.length;
@@ -27,13 +24,18 @@ const Seller = () => {
   );
 
   return (
-    <div>
+    <div className="min-h-screen w-full">
       <SellerTab /> {/* เรียกใช้คอมโพเนนต์ SellerTab */}
-      
-      <div>
+      <div className="ml-64 p-12">
         <h1 className="text-2xl font-bold mb-6">ภาพรวมร้านค้า</h1>
-        </div>
+        <div className="grid grid-cols-3 gap-6">
+          <StatCard icon={<Package />} title="จำนวนสินค้า" value={totalProducts} />
+          <StatCard icon={<ShoppingCart />} title="จำนวนสต็อก" value={totalStock} />
+          <StatCard icon={<BarChart />} title="ยอดรวมมูลค่า" value={totalValue} />
       </div>
+      </div>
+
+    </div>
   );
 };
 

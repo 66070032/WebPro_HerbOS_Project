@@ -2,9 +2,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchWithAuth } from "../app/utils/auth";
-import { CircleUser } from "lucide-react";
+import { CircleUser, Menu, X } from "lucide-react";
 import Link from "next/link";
-import Navbar from "./Navbar";
 
 export default function Sidebar() {
   const [user, setUser] = useState(null);
@@ -40,37 +39,63 @@ export default function Sidebar() {
   }, []);
 
   return (
-      <div className="w-64 h-screen bg-gray-900 text-white p-5">
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={toggleMenu}
+        className="fixed top-4 left-4 md:hidden z-50 bg-gray-900 p-2 rounded text-white"
+      >
+        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Sidebar */}
+      <div
+        className={`fixed md:static top-0 left-0 h-screen w-64 bg-gray-900 text-white p-5 transition-transform ${
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 md:flex md:flex-col`}
+      >
         {/* Profile Section */}
         <div className="mt-6 flex items-center flex-col text-center mb-6">
           <CircleUser size={32} />
           <div>
-            <h1>Dashboard</h1>
+            <h1 className="text-lg font-semibold">Dashboard</h1>
             {!user ? (
               <p>Loading...</p>
             ) : (
               <div>
-                <p>Username: {user.username}</p>
-                <button onClick={logout}>Logout</button>
+                <p className="text-sm">Username: {user.username}</p>
+                <button
+                  onClick={logout}
+                  className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                >
+                  Logout
+                </button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Menu Items */}
         <nav>
-          <ul className="flex flex-col justify-center items-center">
-            <li className="hover:bg-gray-700 p-2 rounded">
+          <ul className="flex flex-col justify-center items-center gap-3">
+            <li className="w-full text-center hover:bg-gray-700 p-2 rounded">
               <Link href="/profile/editprofile">บัญชีของฉัน</Link>
             </li>
-            <li className="hover:bg-gray-700 p-2 rounded">
+            <li className="w-full text-center hover:bg-gray-700 p-2 rounded">
               <Link href="/profile/editpassword">Security</Link>
             </li>
-            <li className="hover:bg-gray-700 p-2 rounded text-red-400">
+            <li className="w-full text-center hover:bg-gray-700 p-2 rounded text-red-400">
               <button onClick={logout}>Logout</button>
             </li>
           </ul>
         </nav>
       </div>
+
+      {isMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 md:hidden"
+          onClick={toggleMenu}
+        ></div>
+      )}
+    </>
   );
 }
