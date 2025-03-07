@@ -53,6 +53,12 @@ export default function Home() {
           className="rounded-lg shadow-lg"
         />
       </div>
+            localStorage.setItem('accessToken', result.accessToken)
+            if (result.role === 'admin') {
+                router.push('/admin')
+            } else {
+                router.push('/')
+            }
 
       {/* Form Section */}
       <div className="w-full md:w-1/3  p-8 ">

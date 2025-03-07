@@ -174,7 +174,7 @@ app.get("/custom", async (req, res) => {
         FROM products
         INNER JOIN category
         ON products.category_id = category.id
-        WHERE is_custom = 1
+        WHERE custom = 1
     `);
 
     connection.release();
