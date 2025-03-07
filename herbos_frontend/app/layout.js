@@ -1,14 +1,24 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Kanit } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// ✅ Import ฟอนต์ Kanit
+const kanit = Kanit({
+  weight: ["300", "400", "700"], // สามารถเลือกน้ำหนักที่ต้องการได้
+  subsets: ["latin", "thai"],
+  variable: "--font-kanit", // สร้างตัวแปร CSS
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+// ✅ Import ฟอนต์ไทยจากไฟล์ภายในโปรเจค
+const headerfont = localFont({
+  src: [
+    {
+      path: "fonts/SaoChingcha/SaoChingcha-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-header",
 });
 
 export const metadata = {
@@ -18,10 +28,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="th" className={`${kanit.variable} ${headerfont.variable}`}>
+      <body className={`font-sans antialiased`}>
         {children}
       </body>
     </html>

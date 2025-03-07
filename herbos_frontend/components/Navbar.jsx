@@ -1,26 +1,33 @@
 "use client"
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Cart from "./Cart";
 import { CircleUser } from "lucide-react";
 import { useState } from "react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+  
   const profileMenu = () => {
-
+    // ฟังก์ชันว่างสำหรับการใช้งานในอนาคต
   };
 
+  // ฟังก์ชันเพื่อตรวจสอบว่าลิงก์เป็นลิงก์ที่กำลังใช้งานอยู่หรือไม่
+  const isActive = (path) => {
+    return pathname === path;
+  };
 
   return (
-    <nav className="border-gray-200 bg-black">
+    <nav className="border-gray-200 bg-black w-full z-20 top-0 start-0 fixed">
       <div className="w-full flex flex-wrap items-center justify-between mx-auto p-4">
-          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
-            เฮิร์บโอเอส
-          </span>
+        <span className="self-center text-2xl font-semibold text-white">
+          เฮิร์บโอเอส
+        </span>
         <button 
           onClick={toggleMenu}
           type="button" 
@@ -36,37 +43,55 @@ const Navbar = () => {
         <div className={`${isMenuOpen ? 'block' : 'hidden'} w-full md:block md:w-auto`} id="navbar-solid-bg">
           <ul className="flex flex-col font-medium mt-4 rounded-lg bg-gray-50 md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 md:bg-transparent dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700">
             <li>
-              <a
+              <Link
                 href="/"
-                className="block py-2 px-3 md:p-0 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:dark:text-blue-500 dark:bg-blue-600 md:dark:bg-transparent"
-                aria-current="page"
+                className={`block py-2 px-3 md:p-0 rounded md:bg-transparent ${
+                  isActive('/') 
+                    ? 'text-lime-200 md:text-lime-700 bg-lime-700 md:bg-transparent' 
+                    : 'text-black md:text-white hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-lime-700 dark:text-white md:dark:hover:text-lime-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+                }`}
               >
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
-                className="block py-2 px-3 md:p-0 text-white rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              <Link
+                href="/viewproduct"
+                className={`block py-2 px-3 md:p-0 rounded md:bg-transparent ${
+                  isActive('/viewproduct') 
+                    ? 'text-lime-200 md:text-lime-700 bg-lime-700 md:bg-transparent' 
+                    : 'text-black md:text-white hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-lime-700 dark:text-white md:dark:hover:text-lime-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+                }`}
               >
-                Services
-              </a>
+                ดูสินค้า
+              </Link>
             </li>
             <li>
-              <a
-                href="#"
-                className="block py-2 px-3 md:p-0 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+              <Link
+                href="/pricing"
+                className={`block py-2 px-3 md:p-0 rounded md:bg-transparent ${
+                  isActive('/pricing') 
+                    ? 'text-lime-200 md:text-lime-700 bg-lime-700 md:bg-transparent' 
+                    : 'text-black md:text-white hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-lime-700 dark:text-white md:dark:hover:text-lime-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
+                }`}
               >
                 Pricing
-              </a>
+              </Link>
             </li>
             <li>
-                <Cart />
+              <Cart />
             </li>
             <li>
-              <a href="/profile">
+              <Link 
+                href="/profile"
+                className={`block py-2 px-3 md:p-0 rounded md:bg-transparent ${
+                  isActive('/profile') 
+                    ? 'text-lime-200 md:text-lime-700' 
+                    : 'text-black md:text-white md:dark:hover:text-lime-500'
+                }`}
+              >
                 <CircleUser />
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

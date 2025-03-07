@@ -1,7 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+body {
+  font-family: var(--font-kanit), sans-serif;
+}
+h1 {
+  font-family: var(--font-header), sans-serif;
+}
 
 
 @layer base {
