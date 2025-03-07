@@ -34,7 +34,11 @@ export default function Home() {
             }
 
             localStorage.setItem('accessToken', result.accessToken)
-            router.push('/')
+            if (result.role === 'admin') {
+                router.push('/admin')
+            } else {
+                router.push('/')
+            }
 
 
         } catch (error) {
