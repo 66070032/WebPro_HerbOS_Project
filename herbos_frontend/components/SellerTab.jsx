@@ -64,6 +64,24 @@ const SellerSidebar = () => {
               <span>สถานะการชำระเงิน</span>
             </Link>
           </li>
+          <li>
+            <Link
+              href="/login"
+              className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+            >
+              <CreditCard className="mr-3" />
+              <span>ออกจากระบบ</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/payment"
+              className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
+            >
+              <CreditCard className="mr-3" />
+              <span>สถานะการชำระเงิน</span>
+            </Link>
+          </li>
 
           {/* Footer or Additional Info */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-700 text-center text-sm">

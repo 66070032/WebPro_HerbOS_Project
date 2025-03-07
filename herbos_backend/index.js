@@ -125,7 +125,7 @@ app.post("/login", async (req, res) => {
     const userSecretKey = user[0].secret_key;
 
     const accessToken = jwt.sign(
-      { userId: user[0].id, username: userData.username },
+      { userId: user[0].id, username: userData.username, email: user[0].email, phone: user[0].phone, role: user[0].role },
       userSecretKey,
       { expiresIn: "15m" }
     );
@@ -147,36 +147,7 @@ app.post("/login", async (req, res) => {
 app.get("/products", async (req, res) => {
   try {
     const connection = await pool.getConnection();
-    const [results] = await connection.query(`
-      SELECT 
-        products.*, 
-        category.name AS category_name 
-        FROM products
-        INNER JOIN category
-        ON products.category_id = category.id
-        WHERE is_custom = 0
-    `);
-
-    connection.release();
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-app.get("/custom", async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const [results] = await connection.query(`
-      SELECT 
-        products.*, 
-        category.name AS category_name 
-        FROM products
-        INNER JOIN category
-        ON products.category_id = category.id
-        WHERE custom = 1
-    `);
-
+    const [results] = await connection.query("SELECT * FROM products");
     connection.release();
     res.json(results);
   } catch (err) {
@@ -326,13 +297,29 @@ app.post("/addcart", verifyToken, async (req, res) => {
 });
 app.post("/addproduct", verifyToken, async (req, res) => {
   try {
-    const {shop, name, description, price, stock, category_id, images } = req.body;
+    const { name, description, price, stock, category_id, images } = req.body;
     const [results] = await connection.query(
-      "INSERT INTO products (name, description, price, stock, category_id, images) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [shop, name, description, price, stock, category_id, images]
+      "INSERT INTO products (name, description, price, stock, category_id, images) VALUES (?, ?, ?, ?, ?, ?)",
+      [name, description, price, stock, category_id, images]
     );
+    const connection = await pool.getConnection();
     connection.release();
     res.status(200).json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.delete("/cart/:id", verifyToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      "DELETE FROM user_cart WHERE id = ? AND username = ?",
+      [req.params.id, req.user.username]
+    );
+    connection.release();
+    res.status(200).json({ message: "Cart item removed successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });

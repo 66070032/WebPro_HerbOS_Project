@@ -1,46 +1,54 @@
-"use client";
+"use client"
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
-  const router = useRouter();
 
-  useEffect(() => {
-    let accessToken = localStorage.getItem("accessToken");
-    if (accessToken) {
-      router.push("/");
-    }
-  }, []);
+    const router = useRouter();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    useEffect(() => {
+        let accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+            router.push('/');
+        }
+    }, []);
 
-    const formData = new FormData(e.target);
-    const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-    try {
-      const response = await fetch("http://localhost:3100/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: jsonData,
-        credentials: "include",
-      });
+        const formData = new FormData(e.target);
+        const jsonData = JSON.stringify(Object.fromEntries(formData.entries()));
 
-      const result = await response.json();
+        try {
+            const response = await fetch("http://localhost:3100/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: jsonData,
+                credentials: "include"
+            });
 
-      if (response.status != 200) {
-        return alert(result.message);
-      }
+            const result = await response.json();
 
-      localStorage.setItem("accessToken", result.accessToken);
-      router.push("/");
-    } catch (error) {
-      console.error("❌ Login Failed:", error);
-    }
-  };
+            if (response.status != 200) {
+                return alert(result.message)
+            }
 
+            localStorage.setItem('accessToken', result.accessToken)
+            if (result.role === 'admin') {
+              console.log('Redirecting to admin dashboard...');
+              router.push('/seller/dashboard'); // ไปยังหน้าของแอดมิน
+          } else {
+              console.log('Redirecting to user homepage...');
+              router.push('/'); // ไปยังหน้าผู้ใช้ทั่วไป
+          }
+
+
+        } catch (error) {
+            console.error("❌ Login Failed:", error);
+        }
+    };
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center gap-8 px-6 bg-gray-100">
       {/* Image Section */}
@@ -53,12 +61,6 @@ export default function Home() {
           className="rounded-lg shadow-lg"
         />
       </div>
-            localStorage.setItem('accessToken', result.accessToken)
-            if (result.role === 'admin') {
-                router.push('/admin')
-            } else {
-                router.push('/')
-            }
 
       {/* Form Section */}
       <div className="w-full md:w-1/3  p-8 ">

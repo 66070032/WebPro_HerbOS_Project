@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "./utils/auth";
-import Navbar from "../components/Navbar";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function Dashboard() {
@@ -102,7 +103,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* User Greeting - Conditionally rendered */}
         {user && (
           <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 shadow-sm">
             <h3 className="text-xl font-semibold text-purple-800">
@@ -121,7 +121,6 @@ export default function Dashboard() {
         )}
       </main>
       <Footer />
-
     </div>
   );
 }
