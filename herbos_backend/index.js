@@ -125,7 +125,13 @@ app.post("/login", async (req, res) => {
     const userSecretKey = user[0].secret_key;
 
     const accessToken = jwt.sign(
-      { userId: user[0].id, username: userData.username, email: user[0].email, phone: user[0].phone, role: user[0].role },
+      {
+        userId: user[0].id,
+        username: userData.username,
+        email: user[0].email,
+        phone: user[0].phone,
+        role: user[0].role,
+      },
       userSecretKey,
       { expiresIn: "15m" }
     );
@@ -159,12 +165,12 @@ app.get("/products/custom/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const connection = await pool.getConnection();
-    
+
     const [results] = await connection.query(
       "SELECT * FROM products WHERE is_custom = 1 AND id = ?",
       [id]
     );
-    
+
     connection.release();
 
     if (results.length === 0) {
@@ -177,7 +183,6 @@ app.get("/products/custom/:id", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 app.get("/products/:id", async (req, res) => {
   const productId = req.params.id;
@@ -219,6 +224,26 @@ app.get("/selFromCategory", async (req, res) => {
       "SELECT * FROM products WHERE category_id = ?",
       [req.body.category]
     );
+    connection.release();
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Add this to your index.js backend file
+app.get("/ingredients", async (req, res) => {
+  try {
+    const customIds = req.query.custom_id.split(",");
+    const connection = await pool.getConnection();
+
+    // Query ingredients that match the requested custom_id values
+    const [results] = await connection.query(
+      "SELECT * FROM product_custom WHERE custom_id IN (?)",
+      [customIds]
+    );
+
     connection.release();
     res.json(results);
   } catch (err) {
@@ -306,10 +331,27 @@ app.post("/logout", (req, res) => {
 
 app.post("/addcart", verifyToken, async (req, res) => {
   try {
+    const {
+      product_id,
+      custom_name,
+      custom_ingredients,
+      custom_price,
+      concentration,
+    } = req.body;
+
     const connection = await pool.getConnection();
     const [results] = await connection.query(
-      "INSERT INTO user_cart (username, product_id) VALUES (?, ?)",
-      [req.user.username, req.body.product_id]
+      `INSERT INTO user_cart 
+       (username, product_id, custom_name, custom_ingredients, custom_price, concentration) 
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        req.user.username,
+        product_id,
+        custom_name,
+        custom_ingredients,
+        custom_price,
+        concentration,
+      ]
     );
     connection.release();
     res.status(200).json(results);
@@ -318,14 +360,15 @@ app.post("/addcart", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 app.post("/addproduct", verifyToken, async (req, res) => {
   try {
     const { name, description, price, stock, category_id, images } = req.body;
+    const connection = await pool.getConnection();
     const [results] = await connection.query(
       "INSERT INTO products (name, description, price, stock, category_id, images) VALUES (?, ?, ?, ?, ?, ?)",
       [name, description, price, stock, category_id, images]
     );
-    const connection = await pool.getConnection();
     connection.release();
     res.status(200).json(results);
   } catch (err) {

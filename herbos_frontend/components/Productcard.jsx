@@ -32,8 +32,8 @@ const Productcard = ({ categoryId }) => {
       setFilteredProducts(products);
     } else {
       // กรองสินค้าตามหมวดหมู่
-      const filtered = products.filter(product => 
-        product.category_id === parseInt(categoryId)
+      const filtered = products.filter(
+        (product) => product.category_id === parseInt(categoryId)
       );
       setFilteredProducts(filtered);
     }
@@ -48,13 +48,16 @@ const Productcard = ({ categoryId }) => {
       {filteredProducts.length > 0 ? (
         filteredProducts.map((product) => (
           <Link
-            href={`/product_page/${product.id}`}
+            href={
+              product.name === "แชมพู" ||
+              product.name === "สบู่"
+                ? `/customize`
+                : `/product_page/${product.id}`
+            }
             key={product.id}
             className="block"
           >
-            <div
-              className="max-w-xs h-96 bg-white shadow-lg rounded-2xl overflow-hidden text-center"
-            >
+            <div className="max-w-xs h-96 bg-white shadow-lg rounded-2xl overflow-hidden text-center">
               <img
                 src={product.images}
                 alt={product.name}

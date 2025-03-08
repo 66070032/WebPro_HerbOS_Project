@@ -11,6 +11,7 @@ export default function Cart() {
   const [subTotal, setSubTotal] = useState(0);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [ingredients, setIngredients] = useState([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,30 +20,69 @@ export default function Cart() {
 
   const updateCart = async () => {
     try {
-      const [cartResult, productsData] = await Promise.all([
+      const [cartResult, productsData, ingredientsData] = await Promise.all([
         fetchWithAuth("http://localhost:3100/allCart", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         }),
         fetch("http://localhost:3100/products").then((res) => res.json()),
+        fetch("http://localhost:3100/ingredients?custom_id=1,2,3").then((res) =>
+          res.json()
+        ),
       ]);
 
-      // จัดกลุ่มสินค้าในตะกร้าตาม product_id
-      const groupedItems = cartResult.reduce((acc, cartItem) => {
-        const existingItem = acc.find(
-          (item) => item.product_id === cartItem.product_id
-        );
+      // เก็บข้อมูลส่วนผสมเพื่อใช้อ้างอิงภายหลัง
+      setIngredients(Array.isArray(ingredientsData) ? ingredientsData : []);
 
-        if (existingItem) {
+      // จัดกลุ่มสินค้าในตะกร้าตาม product_id และ custom_data
+      const groupedItems = cartResult.reduce((acc, cartItem) => {
+        // สร้าง unique key สำหรับสินค้าที่มีการปรับแต่ง
+        // ใช้ทั้ง product_id, custom_name, custom_ingredients, concentration เป็นตัวจัดกลุ่ม
+        const groupKey = cartItem.custom_name
+          ? `${cartItem.product_id}-${cartItem.custom_name}-${
+              cartItem.custom_ingredients || ""
+            }-${cartItem.concentration || ""}`
+          : `${cartItem.product_id}`;
+
+        // ค้นหาว่ามีสินค้านี้อยู่ในกลุ่มแล้วหรือไม่
+        const existingItemIndex = acc.findIndex((item) => {
+          // ตรวจสอบว่าเป็นสินค้าที่มีการปรับแต่งหรือไม่
+          if (cartItem.custom_name && item.custom_name) {
+            // สำหรับสินค้าที่มีการปรับแต่ง ตรวจสอบทั้ง product_id, custom_name, custom_ingredients, concentration
+            return (
+              item.product_id === cartItem.product_id &&
+              item.custom_name === cartItem.custom_name &&
+              item.custom_ingredients === cartItem.custom_ingredients &&
+              item.concentration === cartItem.concentration
+            );
+          } else {
+            // สำหรับสินค้าปกติ ตรวจสอบเฉพาะ product_id
+            return (
+              item.product_id === cartItem.product_id &&
+              !item.custom_name &&
+              !cartItem.custom_name
+            );
+          }
+        });
+
+        if (existingItemIndex !== -1) {
           // เพิ่มจำนวนหากสินค้ามีอยู่แล้ว
-          existingItem.quantity = (existingItem.quantity || 1) + 1;
-          existingItem.cart_ids = [
-            ...(existingItem.cart_ids || []),
-            cartItem.id,
-          ];
+          acc[existingItemIndex].quantity += 1;
+          acc[existingItemIndex].cart_ids.push(cartItem.id);
+
+          // ตรวจสอบการตั้งค่าราคา
+          if (cartItem.custom_price) {
+            // ตรวจสอบว่าราคาเท่ากันหรือไม่
+            if (acc[existingItemIndex].custom_price !== cartItem.custom_price) {
+              // อาจจะต้องมีการจัดการราคาที่แตกต่างกัน
+              console.log(
+                "Warning: Different prices for the same custom product"
+              );
+            }
+          }
         } else {
-          // ถ้าไม่มีให้เพิ่มอันใหม่ค่าเริ่มที่ 1
+          // สร้างรายการใหม่
           acc.push({
             ...cartItem,
             quantity: 1,
@@ -59,14 +99,55 @@ export default function Cart() {
           (p) => p.id === cartItem.product_id
         );
 
-        if (matchedProduct) {
-          return {
-            ...cartItem,
-            name: matchedProduct.name,
-            price: matchedProduct.price,
-          };
+        let displayName =
+          cartItem.custom_name ||
+          (matchedProduct
+            ? matchedProduct.name
+            : `สินค้า #${cartItem.product_id}`);
+
+        // แสดงข้อมูลเพิ่มเติมสำหรับสินค้าที่มีการปรับแต่ง
+        let displayInfo = "";
+
+        // แสดงข้อมูลส่วนผสมถ้ามี
+        if (cartItem.custom_ingredients && Array.isArray(ingredientsData)) {
+          try {
+            // แปลง JSON string กลับเป็น array
+            const ingredientIds = JSON.parse(cartItem.custom_ingredients);
+
+            // ดึงข้อมูลส่วนผสมและแสดงชื่อ
+            if (ingredientIds.length > 0) {
+              const ingredientNames = ingredientIds
+                .map((id) => {
+                  const ing = ingredientsData.find((p) => p.id === id);
+                  return ing ? ing.name : `ส่วนผสม #${id}`;
+                })
+                .filter(Boolean) // กรองค่า null/undefined ออก
+                .join(", ");
+
+              if (ingredientNames) {
+                displayInfo += `ส่วนผสม: ${ingredientNames}`;
+              }
+            }
+          } catch (e) {
+            console.error("Error parsing custom_ingredients:", e);
+          }
         }
-        return cartItem;
+
+        // เพิ่มข้อมูลความเข้มข้น (ถ้ามี)
+        if (cartItem.concentration) {
+          displayInfo += displayInfo
+            ? `, ความเข้มข้น: ${cartItem.concentration}%`
+            : `ความเข้มข้น: ${cartItem.concentration}%`;
+        }
+
+        return {
+          ...cartItem,
+          name: displayName,
+          info: displayInfo,
+          price:
+            Number(cartItem.custom_price) ||
+            (matchedProduct ? Number(matchedProduct.price) : 0),
+        };
       });
 
       setCartItems(processedCartItems);
@@ -80,7 +161,9 @@ export default function Cart() {
 
       // ราคาสินค้าทั้งหมด
       const total = processedCartItems.reduce((sum, item) => {
-        return sum + (item.price || 0) * (item.quantity || 1);
+        const price = Number(item.price || 0);
+        const quantity = Number(item.quantity || 1);
+        return sum + price * quantity;
       }, 0);
 
       setSubTotal(total);
@@ -90,19 +173,28 @@ export default function Cart() {
   };
 
   // เพิ่มจำนวนสินค้า
-  const increaseQuantity = async (productId) => {
+  const increaseQuantity = async (item) => {
     if (isUpdating) return;
     setIsUpdating(true);
-    
+
     try {
-      // เพิ่มสินค้าในตะกร้า - URL ผิด มี / เกินมา
-      await fetchWithAuth("http://localhost:3100/addcart", { // แก้จาก //addproduct เป็น /addcart
+      // สร้างข้อมูลสำหรับส่งไป API
+      const cartData = {
+        product_id: item.product_id,
+        custom_name: item.custom_name || null,
+        custom_ingredients: item.custom_ingredients || null,
+        custom_price: item.custom_price || null,
+        concentration: item.concentration || null,
+      };
+
+      // เพิ่มสินค้าในตะกร้า
+      await fetchWithAuth("http://localhost:3100/addcart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ product_id: productId }),
+        body: JSON.stringify(cartData),
       });
-      
+
       // อัพเดทข้อมูลตะกร้า
       await updateCart();
     } catch (err) {
@@ -203,10 +295,13 @@ export default function Cart() {
                     className="p-2 border-b flex justify-between"
                   >
                     <div className="flex-1">
-                      <p className="font-semibold">
-                        {item.name || `สินค้า #${item.product_id}`}
+                      <p className="font-semibold">{item.name}</p>
+                      {item.info && (
+                        <p className="text-sm text-gray-500">{item.info}</p>
+                      )}
+                      <p className="text-gray-600">
+                        ฿{Number(item.price || 0).toFixed(2)}
                       </p>
-                      <p className="text-gray-600">฿{item.price || 0}</p>
                     </div>
 
                     {/* ปุ่มเพิ่ม/ลดจำนวน */}
@@ -229,7 +324,7 @@ export default function Cart() {
                         {item.quantity || 1}
                       </span>
                       <button
-                        onClick={() => increaseQuantity(item.product_id)}
+                        onClick={() => increaseQuantity(item)}
                         className="bg-gray-200 hover:bg-gray-300 rounded-full h-6 w-6 flex items-center justify-center"
                         disabled={isUpdating}
                       >
@@ -253,7 +348,7 @@ export default function Cart() {
               </div>
               <div className="flex justify-between mt-2 font-bold text-lg">
                 <span>ยอดรวม</span>
-                <span>฿{subTotal}</span>
+                <span>฿{Number(subTotal || 0).toFixed(2)}</span>
               </div>
             </div>
 
