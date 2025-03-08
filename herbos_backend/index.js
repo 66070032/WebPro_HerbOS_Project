@@ -155,6 +155,29 @@ app.get("/products", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+app.get("/products/custom/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const connection = await pool.getConnection();
+    
+    const [results] = await connection.query(
+      "SELECT * FROM products WHERE is_custom = 1 AND id = ?",
+      [id]
+    );
+    
+    connection.release();
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Custom product not found" });
+    }
+
+    res.json(results[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 
 app.get("/products/:id", async (req, res) => {
   const productId = req.params.id;
