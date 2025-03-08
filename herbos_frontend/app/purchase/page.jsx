@@ -142,6 +142,10 @@ export default function Purchase() {
       .catch((err) => console.error("Error:", err));
   }, []);
 
+  const handleCheckout = async () => {
+    router.push('/purchase/payment?amount='+calculateTotal());
+  }
+
   const back = () => {
     router.push("/viewproduct");
   };

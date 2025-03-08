@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mysql from "mysql2/promise";
 import crypto from "crypto";
+import qrcode from "qrcode";
 
 const PORT = 3100;
 const REFRESH_SECRET =
@@ -404,6 +405,33 @@ app.get("/allCart", verifyToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.post("/generate-promptpay", async (req, res) => {
+  const { accountNumber, amount } = req.body;
+
+  if (!accountNumber) {
+      return res.status(400).json({ message: "Account number is required" });
+  }
+
+  try {
+      const formatAccount = accountNumber.replace(/-/g, '');
+      const serviceCode = '000201';
+      const promptPayPrefix = '010212';
+      const accountData = `2937A000000677010111${formatAccount}`;
+      const currency = '530376';
+      const amountData = amount ? `54${parseFloat(amount).toFixed(2).replace('.', '')}` : '';
+      const countryCode = '5802TH';
+      const checksumPlaceholder = '6304';
+
+      const payload = `${serviceCode}${promptPayPrefix}${accountData}${currency}${amountData}${countryCode}${checksumPlaceholder}`;
+      const qrCode = await qrcode.toDataURL(payload);
+
+      res.json({ qrCode });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Failed to generate QR Code" });
   }
 });
 
