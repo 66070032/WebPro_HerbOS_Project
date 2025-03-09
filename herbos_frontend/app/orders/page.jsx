@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchWithAuth } from "../utils/auth";
-import Profile from "../../components/ProfileHead";
+import Navbar from "../../components/Navbar";
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
@@ -31,25 +31,20 @@ export default function Orders() {
 
     return (
         <div className="flex min-h-screen bg-gray-50 p-6">
-            {/* Profile Header */}
-            <div className="w-1/4">
-                <Profile />
-            </div>
+            {/* Navbar */}
+            <Navbar />
 
             {/* Main Content */}
-            <div className="w-3/4 flex flex-col items-center">
+            <div className=" flex flex-col items-center mt-20 w-full justify-center">
                 <h1 className="text-3xl font-bold text-blue-600 mb-8">Orders</h1>
                 {orders.length === 0 ? (
                     <p className="text-xl text-gray-600">No orders found.</p>
                 ) : (
                     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {orders.map((order) => (
-                            <div
-                                key={order.id}
-                                className="p-6 border rounded-lg shadow-lg bg-white transition duration-300 hover:shadow-xl"
-                            >
+                        {orders.map((order, index) => (
+                            <div key={order.id || `order-${index}`} className="p-6 border rounded-lg shadow-lg bg-white transition duration-300 hover:shadow-xl">
                                 <h2 className="text-xl font-semibold text-blue-600 mb-4">
-                                    Order ID: {order.id}
+                                    Order ID: {order.order_id}
                                 </h2>
                                 <div className="text-gray-700 mb-2">
                                     <strong>Status:</strong> {order.order_status}
@@ -61,7 +56,7 @@ export default function Orders() {
                                     <strong>Payment Status:</strong> {order.payment_status}
                                 </div>
                                 <div className="text-gray-700">
-                                    <strong>Order Date:</strong> {new Date(order.created_at).toLocaleDateString()}
+                                    <strong>Order Date:</strong> {new Date(order.order_date).toLocaleDateString()}
                                 </div>
                             </div>
                         ))}
