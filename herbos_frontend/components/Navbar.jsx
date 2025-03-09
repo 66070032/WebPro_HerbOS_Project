@@ -83,7 +83,7 @@ const Navbar = () => {
               <Cart />
             </li>
             <li>
-              <Link href="/order">
+              <Link href="/orders">
                 <Truck className="text-white" />
               </Link>
             </li>
