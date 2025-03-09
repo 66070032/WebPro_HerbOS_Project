@@ -24,11 +24,11 @@ const SellerSidebar = () => {
           {/* Dashboard */}
           <li>
             <Link
-              href="/dashboard"
+              href="/seller/dashboard"
               className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
             >
               <Home className="mr-3" />
-              <span>Dashboard</span>
+              <span>หน้าหลัก</span>
             </Link>
           </li>
 
@@ -54,16 +54,6 @@ const SellerSidebar = () => {
             </Link>
           </li>
 
-          {/* Payment */}
-          <li>
-            <Link
-              href="/payment"
-              className="flex items-center p-3 rounded-lg hover:bg-gray-700 transition-colors duration-200"
-            >
-              <CreditCard className="mr-3" />
-              <span>สถานะการชำระเงิน</span>
-            </Link>
-          </li>
           <li>
             <Link
               href="/login"
