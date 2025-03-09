@@ -581,6 +581,21 @@ app.post("/paymentSuccess", verifyToken, async (req, res) => {
   }
 });
 
+app.get('/isAdmin', verifyToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      "SELECT role FROM users WHERE id = ?",
+      [req.user.userId]
+    );
+    connection.release();
+    return results[0].role === 'admin' ? res.json(true) : res.json(false);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+})
+
 try {
   console.clear();
   await pool.getConnection();

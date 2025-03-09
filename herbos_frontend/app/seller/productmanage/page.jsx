@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Plus, ChevronDown, CheckSquare, Square, Edit, Trash2, } from "lucide-react";
 import SellerTab from "../../../components/SellerTab";
 import Addproduct from "../../../components/Addproduct";
+import { fetchWithAuth } from "../../utils/auth";
 import Image from "next/image";
 
 export default function Products() {
@@ -10,9 +11,11 @@ export default function Products() {
   const userData = localStorage.getItem("accessToken");
   
   useEffect(() => {
-    if (userData.role !== 'admin') {
-      window.location.href = '/';
-    }
+    fetchWithAuth('http://localhost:3100/isAdmin').then((res) => {
+          if(!res) {
+            window.location.href = '/';
+          }
+        }).catch((err) => console.error('Error:', err));
       fetch('http://localhost:3100/products')
       .then((res) => res.json())
       .then((data) => setProducts(data))

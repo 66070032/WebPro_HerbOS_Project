@@ -12,7 +12,7 @@ export default function PaymentPage() {
   const searchParams = useSearchParams();
 
   const amount = searchParams.get('amount') || '10';
-
+  
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     setFile(selectedFile);
@@ -20,7 +20,7 @@ export default function PaymentPage() {
       setPreview(URL.createObjectURL(selectedFile));
     }
   };
-
+  
   const handleVerifyPayment = async () => {
     if (!file) {
       alert('กรุณาเลือกไฟล์ก่อน!');
@@ -72,7 +72,7 @@ export default function PaymentPage() {
         <p className="text-gray-700">Bank: <strong>SCB</strong></p>
         <p className="text-gray-700">เลขบัญชี: <strong>1642885919</strong></p>
         <p className="text-gray-700">ชื่อบัญชี: <strong>นาย เจตนิพัทธ์ ทานะมัย</strong></p>
-        
+
         {/* อัปโหลดไฟล์สลิป */}
         <div className="mt-4">
           <label className="block text-sm font-medium text-gray-600">อัปโหลดสลิปการชำระเงิน</label>

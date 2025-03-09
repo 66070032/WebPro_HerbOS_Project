@@ -3,16 +3,18 @@ import React, { useState, useEffect } from "react";
 import SellerTab from "../../../components/SellerTab";
 import StatCard from "../../../components/StatCard";
 import { Package, ShoppingCart, BarChart} from "lucide-react";
+import { fetchWithAuth } from "../../utils/auth";
 
 const Seller = () => {
   const [products, setProducts] = useState([]);
-  const userData = localStorage.getItem("accessToken");
   
   useEffect(() => {
-      if (userData.role !== 'admin') {
+    fetchWithAuth('http://localhost:3100/isAdmin').then((res) => {
+      if(!res) {
         window.location.href = '/';
       }
-      fetch('http://localhost:3100/products')
+    }).catch((err) => console.error('Error:', err));
+    fetch('http://localhost:3100/products')
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch((err) => console.error('Error:', err));
