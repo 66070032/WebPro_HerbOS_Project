@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
+import { fetchWithAuth } from '../../utils/auth';
 
 export default function PaymentPage() {
   const [file, setFile] = useState(null);
@@ -42,7 +43,12 @@ export default function PaymentPage() {
       if (dataPayment.receiver.bank.short === 'SCB' && dataPayment.receiver.account.name.th === 'นาย เจตนิพัทธ์ ท') {
         if (parseFloat(payAmount) === parseFloat(amount)) {
             alert('✅ ชำระเงินเรียบร้อย!');
-            // router.push('/success'); // นำทางไปยังหน้าสำเร็จ
+            const success = await fetchWithAuth('http://localhost:3100/paymentSuccess', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include'
+            })
+            router.push('/'); // นำทางไปยังหน้าสำเร็จ
           } else {
             alert('❌ ยอดเงินไม่ตรง กรุณาตรวจสอบอีกครั้ง!');
           }
