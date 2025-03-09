@@ -49,8 +49,7 @@ const Productcard = ({ categoryId }) => {
         filteredProducts.map((product) => (
           <Link
             href={
-              product.name === "แชมพู" ||
-              product.name === "สบู่"
+              product.name === "แชมพู" || product.name === "สบู่" || product.name === "ยาดมสมุนไพร"
                 ? `/customize`
                 : `/product_page/${product.id}`
             }

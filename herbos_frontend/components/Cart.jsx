@@ -27,7 +27,7 @@ export default function Cart() {
           credentials: "include",
         }),
         fetch("http://localhost:3100/products").then((res) => res.json()),
-        fetch("http://localhost:3100/ingredients?custom_id=1,2,3").then((res) =>
+        fetch("http://localhost:3100/ingredients?custom_id=1,2,4").then((res) =>
           res.json()
         ),
       ]);
@@ -119,7 +119,7 @@ export default function Cart() {
               const ingredientNames = ingredientIds
                 .map((id) => {
                   const ing = ingredientsData.find((p) => p.id === id);
-                  return ing ? ing.name : `ส่วนผสม #${id}`;
+                  return ing ? ing.name : null;
                 })
                 .filter(Boolean) // กรองค่า null/undefined ออก
                 .join(", ");
@@ -133,7 +133,7 @@ export default function Cart() {
           }
         }
 
-        // เพิ่มข้อมูลความเข้มข้น (ถ้ามี)
+        // เพิ่มข้อมูลความเข้มข้น (ถ้ามี) สำหรับทุกสินค้าที่มีการปรับแต่ง
         if (cartItem.concentration) {
           displayInfo += displayInfo
             ? `, ความเข้มข้น: ${cartItem.concentration}%`

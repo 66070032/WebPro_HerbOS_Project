@@ -13,7 +13,7 @@ import {
 
 const Customize = () => {
   // State management
-  const [productType, setProductType] = useState(1); // 1 = shampoo, 2 = soap
+  const [productType, setProductType] = useState(1); // 1 = shampoo, 2 = soap, 3 = inhaler
   const [ingredients, setIngredients] = useState([]);
   const [selectedIngredients, setSelectedIngredients] = useState([]);
   const [concentration, setConcentration] = useState(50);
@@ -27,7 +27,7 @@ const Customize = () => {
       try {
         setLoading(true);
         const ingredientsResponse = await fetch(
-          "http://localhost:3100/ingredients?custom_id=1,2,3"
+          "http://localhost:3100/ingredients?custom_id=1,2,4"
         );
         if (!ingredientsResponse.ok) {
           throw new Error("Failed to fetch ingredients");
@@ -41,7 +41,8 @@ const Customize = () => {
         }
         const productsData = await productsResponse.json();
         const filteredProducts = productsData.filter(
-          (product) => product.id === 11 || product.id === 12
+          (product) =>
+            product.id === 11 || product.id === 12 || product.id === 10
         );
         setBaseProducts(filteredProducts);
       } catch (error) {
@@ -56,12 +57,12 @@ const Customize = () => {
 
   // Filter ingredients based on product type
   const filteredIngredients = ingredients.filter(
-    (ing) => ing.custom_id === productType || ing.custom_id === 3
+    (ing) => ing.custom_id === (productType === 3 ? 4 : productType)
   );
 
   // Get base product data
   const getBaseProduct = () => {
-    const baseProductId = productType === 1 ? 11 : 12;
+    const baseProductId = productType === 1 ? 11 : productType === 2 ? 12 : 10;
     return baseProducts.find((product) => product.id === baseProductId);
   };
 
@@ -76,7 +77,9 @@ const Customize = () => {
       ? baseProduct.images
       : productType === 1
       ? "https://thai-pump-bottle.com/photo/p13582418-16_7..."
-      : "https://mockups-design.com/wp-content/uploads/2022...";
+      : productType === 2
+      ? "https://mockups-design.com/wp-content/uploads/2022..."
+      : "https://via.placeholder.com/40";
   };
 
   // Calculate total price
@@ -120,7 +123,7 @@ const Customize = () => {
   const getIngredientColor = (name) => {
     if (["ขมิ้นชัน", "ขิง", "ไพล", "มะขาม"].includes(name)) {
       return "bg-amber-50 border-amber-200";
-    } else if (["แตงกวา", "ว่านหางจระเข้", "มะกรูด"].includes(name)) {
+    } else if (["แตงกวา", "ว่านหางจระเข้", "มะกรูด", "การบูร", "เปปเปอร์มินต์"].includes(name)) {
       return "bg-green-50 border-green-200";
     } else if (["อัญชัน", "มังคุด"].includes(name)) {
       return "bg-purple-50 border-purple-200";
@@ -134,35 +137,39 @@ const Customize = () => {
       alert("กรุณาเลือกส่วนผสมอย่างน้อย 1 ชนิด");
       return;
     }
-  
+
     try {
-      const baseProductName = productType === 1 ? "แชมพูสมุนไพร" : "สบู่สมุนไพร";
+      const baseProductName = getProductTypeName();
       const selectedIngNames = getSelectedIngredientsDetails()
         .map((ing) => ing.name)
         .join(", ");
       const productName = `${baseProductName} (${selectedIngNames})`;
-  
+
       const cartData = {
-        product_id: getBaseProduct()?.id || (productType === 1 ? 11 : 12),
+        product_id:
+          getBaseProduct()?.id ||
+          (productType === 1 ? 11 : productType === 2 ? 12 : 10),
         quantity: quantity,
         custom_name: productName,
         custom_ingredients: JSON.stringify(selectedIngredients),
         concentration: concentration,
         custom_price: calculateTotalPrice() / quantity,
       };
-  
-      const addCartPromises = Array(quantity).fill().map(() => 
-        fetchWithAuth("http://localhost:3100/addcart", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify(cartData),
-        })
-      );
-  
+
+      const addCartPromises = Array(quantity)
+        .fill()
+        .map(() =>
+          fetchWithAuth("http://localhost:3100/addcart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify(cartData),
+          })
+        );
+
       await Promise.all(addCartPromises);
       alert("เพิ่มสินค้าลงตะกร้าเรียบร้อยแล้ว");
-  
+
       setSelectedIngredients([]);
       setConcentration(50);
       setQuantity(1);
@@ -172,23 +179,51 @@ const Customize = () => {
     }
   };
 
+  // Get base product name
+  const getProductTypeName = () => {
+    switch (productType) {
+      case 1:
+        return "แชมพูสมุนไพร";
+      case 2:
+        return "สบู่สมุนไพร";
+      case 3:
+        return "ยาดมสมุนไพร";
+      default:
+        return "";
+    }
+  };
+
+  // Get product description
+  const getProductDescription = () => {
+    switch (productType) {
+      case 1:
+        return "แชมพูสมุนไพรที่คุณสามารถเลือกส่วนผสมได้เอง เหมาะสำหรับทุกประเภทผมและหนังศีรษะ";
+      case 2:
+        return "สบู่สมุนไพรที่คุณสามารถเลือกส่วนผสมได้เอง อ่อนโยนต่อผิว";
+      case 3:
+        return "ยาดมสมุนไพรที่คุณสามารถเลือกส่วนผสมได้เอง ช่วยให้รู้สึกสดชื่น";
+      default:
+        return "";
+    }
+  };
+
   return (
     <div className="w-full min-h-screen bg-white">
       <Navbar />
 
       <div className="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
         <h1 className="text-2xl font-medium mb-2 text-purple-800">
-          {productType === 1 ? "แชมพูสมุนไพร" : "สบู่สมุนไพร"}
+          {getProductTypeName()}
           <span className="text-lg text-gray-500 ml-2 font-normal">
-            {productType === 1 ? "Herbal Shampoo" : "Herbal Soap"}
+            {productType === 1
+              ? "Herbal Shampoo"
+              : productType === 2
+              ? "Herbal Soap"
+              : "Herbal Inhaler"}
           </span>
         </h1>
 
-        <p className="mb-8 text-gray-600 text-sm">
-          {productType === 1
-            ? "แชมพูสมุนไพรที่คุณสามารถเลือกส่วนผสมได้เอง เหมาะสำหรับทุกประเภทผมและหนังศีรษะ"
-            : "สบู่สมุนไพรที่คุณสามารถเลือกส่วนผสมได้เอง อ่อนโยนต่อผิว"}
-        </p>
+        <p className="mb-8 text-gray-600 text-sm">{getProductDescription()}</p>
 
         <div className="flex flex-col md:flex-row gap-12">
           {/* Left column - product image and type selection */}
@@ -202,7 +237,7 @@ const Customize = () => {
                 ) : (
                   <img
                     src={getBaseImage()}
-                    alt={productType === 1 ? "แชมพูสมุนไพร" : "สบู่สมุนไพร"}
+                    alt={getProductTypeName()}
                     className="max-h-[90%] max-w-[90%] object-contain"
                   />
                 )}
@@ -231,8 +266,18 @@ const Customize = () => {
               >
                 สบู่สมุนไพร
               </button>
+              <button
+                className={`py-2 px-4 rounded-full text-center transition-all text-sm ${
+                  productType === 3
+                    ? "bg-purple-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+                onClick={() => toggleProductType(3)}
+              >
+                ยาดมสมุนไพร
+              </button>
             </div>
-            
+
             {/* Price and cart section */}
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex justify-between items-center mb-4">
@@ -318,7 +363,9 @@ const Customize = () => {
                           className="w-10 h-10 rounded-full object-cover"
                         />
                         <div>
-                          <p className="font-medium text-sm">{ingredient.name}</p>
+                          <p className="font-medium text-sm">
+                            {ingredient.name}
+                          </p>
                           <p className="text-gray-500 text-xs">
                             {ingredient.name_en}
                           </p>
@@ -342,7 +389,9 @@ const Customize = () => {
             {/* Concentration slider */}
             <div className="mb-8">
               <div className="flex justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">ความเข้มข้น</span>
+                <span className="text-sm font-medium text-gray-700">
+                  ความเข้มข้น
+                </span>
                 <div className="flex items-center">
                   <input
                     type="number"
@@ -374,19 +423,22 @@ const Customize = () => {
                   <span>ปานกลาง</span>
                   <span>เข้มข้น</span>
                 </div>
-                <div className="absolute -top-4 transform -translate-x-1/2 left-1/2">
+                <div
+                  className="absolute -top-6 text-xs text-gray-600 transform -translate-x-1/2"
+                  style={{ left: `${concentration}%` }}
+                >
                   {concentration < 33 && (
-                    <span className="bg-green-500 text-white px-2 py-1 text-xs rounded-full absolute -translate-x-8">
+                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded">
                       อ่อน
                     </span>
                   )}
                   {concentration >= 33 && concentration < 66 && (
-                    <span className="bg-purple-500 text-white px-2 py-1 text-xs rounded-full absolute -translate-x-4">
+                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded">
                       ปานกลาง
                     </span>
                   )}
                   {concentration >= 66 && (
-                    <span className="bg-purple-800 text-white px-2 py-1 text-xs rounded-full absolute">
+                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded">
                       เข้มข้น
                     </span>
                   )}
@@ -415,8 +467,12 @@ const Customize = () => {
                       key={ing.id}
                       className="mb-3 pb-3 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0"
                     >
-                      <h4 className="font-medium text-purple-700">{ing.name}</h4>
-                      <p className="text-xs text-gray-600 mt-1">{ing.description}</p>
+                      <h4 className="font-medium text-purple-700">
+                        {ing.name}
+                      </h4>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {ing.description}
+                      </p>
                     </div>
                   ))
                 ) : (

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Navbar from "../../components/Navbar";
 import Productcard from "../../components/Productcard";
 import Footer from "../../components/Footer";
-import { Search } from 'lucide-react';
+import { Search } from "lucide-react";
 
 const Product = () => {
   const [categories, setCategories] = useState([]);
@@ -56,18 +56,20 @@ const Product = () => {
     return "/images/default-category.png";
   };
 
-
-
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-[#DFC8E7] to-[#E8D8F0]">
       <Navbar />
-      
+
       <div className="container mx-auto px-4 pt-28 pb-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-purple-800 mb-3">สินค้าของเรา</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">ค้นพบผลิตภัณฑ์คุณภาพเพื่อสุขภาพและความงามที่ผลิตจากธรรมชาติ</p>
+          <h1 className="text-4xl font-bold text-purple-800 mb-3">
+            สินค้าของเรา
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            ค้นพบผลิตภัณฑ์คุณภาพเพื่อสุขภาพและความงามที่ผลิตจากธรรมชาติ
+          </p>
         </div>
-        
+
         {/* Search Bar */}
         <div className="relative max-w-md mx-auto mb-8">
           <input
@@ -81,59 +83,73 @@ const Product = () => {
             <Search size={20} />
           </div>
         </div>
-        
+
         {/* Categories */}
         <div className="mb-12">
-          <h2 className="text-xl font-semibold text-purple-800 mb-6 text-center">หมวดหมู่สินค้า</h2>
+          <h2 className="text-xl font-semibold text-purple-800 mb-6 text-center">
+            หมวดหมู่สินค้า
+          </h2>
           <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
             {/* All Products Category */}
             <div
               className={`flex flex-col items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
-                selectedCategory === "all" 
-                  ? "bg-white shadow-lg scale-105 border-2 border-purple-400" 
+                selectedCategory === "all"
+                  ? "bg-white shadow-lg scale-105 border-2 border-purple-400"
                   : "hover:bg-white hover:bg-opacity-60 hover:shadow"
               }`}
               onClick={() => setSelectedCategory("all")}
             >
               <div className="w-16 h-16 flex items-center justify-center bg-gradient-to-br from-purple-400 to-pink-300 rounded-full shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               </div>
               <span className="mt-3 font-medium text-purple-900">ทั้งหมด</span>
             </div>
-            
+
             {/* Categories from API */}
-            {!loading && categories.map((category) => (
-              <div
-                key={category.id}
-                className={`flex flex-col items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
-                  selectedCategory === category.id.toString() 
-                    ? "bg-white shadow-lg scale-105 border-2 border-purple-400" 
-                    : "hover:bg-white hover:bg-opacity-60 hover:shadow"
-                }`}
-                onClick={() => setSelectedCategory(category.id.toString())}
-              >
-                <div className="w-16 h-16 rounded-full overflow-hidden shadow-md">
-                  <img
-                    src={getCategoryImage(category.id)}
-                    alt={category.name}
-                    className="w-full h-full object-cover"
-                  />
+            {!loading &&
+              categories.map((category) => (
+                <div
+                  key={category.id}
+                  className={`flex flex-col items-center p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
+                    selectedCategory === category.id.toString()
+                      ? "bg-white shadow-lg scale-105 border-2 border-purple-400"
+                      : "hover:bg-white hover:bg-opacity-60 hover:shadow"
+                  }`}
+                  onClick={() => setSelectedCategory(category.id.toString())}
+                >
+                  <div className="w-16 h-16 rounded-full overflow-hidden shadow-md">
+                    <img
+                      src={getCategoryImage(category.id)}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <span className="mt-3 font-medium text-purple-900">
+                    {category.name}
+                  </span>
                 </div>
-                <span className="mt-3 font-medium text-purple-900">{category.name}</span>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
-        
 
-        
         {/* Product Display */}
         <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-md">
           {/* Pass all filter params to ProductCard component */}
-          <Productcard 
-            categoryId={selectedCategory} 
+          <Productcard
+            categoryId={selectedCategory}
             priceRange={priceRange}
             sortBy={sortBy}
             searchTerm={searchTerm}
@@ -141,10 +157,10 @@ const Product = () => {
           />
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
-};  
+};
 
 export default Product;

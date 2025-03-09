@@ -20,7 +20,7 @@ export default function Purchase() {
         credentials: "include",
       }),
       fetch("http://localhost:3100/products").then((res) => res.json()),
-      fetch("http://localhost:3100/ingredients?custom_id=1,2,3").then((res) =>
+      fetch("http://localhost:3100/ingredients?custom_id=1,2,4").then((res) =>
         res.json()
       ),
     ])
@@ -88,7 +88,7 @@ export default function Purchase() {
                 const ingredientNames = ingredientIds
                   .map((id) => {
                     const ing = ingredientsData.find((p) => p.id === id);
-                    return ing ? ing.name : `ส่วนผสม #${id}`;
+                    return ing ? ing.name : null;
                   })
                   .filter(Boolean)
                   .join(", ");
@@ -102,7 +102,7 @@ export default function Purchase() {
             }
           }
 
-          // เพิ่มข้อมูลความเข้มข้น (ถ้ามี)
+          // เพิ่มข้อมูลความเข้มข้น (ถ้ามี) สำหรับทุกสินค้าที่มีการปรับแต่ง
           if (cartItem.concentration) {
             displayInfo += displayInfo
               ? `, ความเข้มข้น: ${cartItem.concentration}%`
@@ -150,7 +150,7 @@ export default function Purchase() {
   };
 
   const calculateTotal = () => {
-    return subTotal
+    return subTotal;
   };
 
   return (
@@ -209,7 +209,10 @@ export default function Purchase() {
         </div>
 
         <div className="bg-white p-4 flex justify-center items-center rounded">
-          <button className="w-1/2 bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600" onClick={handleCheckout}>
+          <button
+            className="w-1/2 bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600"
+            onClick={handleCheckout}
+          >
             สั่งสินค้า
           </button>
         </div>
