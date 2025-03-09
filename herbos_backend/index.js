@@ -356,14 +356,12 @@ app.post("/addproduct", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-// สร้างคำสั่งซื้อ
+
 app.post("/orders", verifyToken, async (req, res) => {
   const { order_status, total_amount, payment_status } = req.body;
 
   try {
     const connection = await pool.getConnection();
-
-    // คำสั่ง SQL สำหรับการบันทึกคำสั่งซื้อ
     const query =
       "INSERT INTO orders (user_id, username, order_status, total_amount, payment_status) VALUES (?, ?, ?, ?, ?)";
     const [result] = await connection.query(query, [
@@ -373,8 +371,6 @@ app.post("/orders", verifyToken, async (req, res) => {
       total_amount,
       payment_status,
     ]);
-
-    console.log(result)
 
     connection.release();
     res.status(201).json({

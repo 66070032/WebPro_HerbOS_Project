@@ -37,10 +37,8 @@ export default function Home() {
 
             localStorage.setItem('accessToken', result.accessToken)
             if (result.role === 'admin') {
-              console.log('Redirecting to admin dashboard...');
               router.push('/seller/dashboard'); // ไปยังหน้าของแอดมิน
           } else {
-              console.log('Redirecting to user homepage...');
               router.push('/'); // ไปยังหน้าผู้ใช้ทั่วไป
           }
 

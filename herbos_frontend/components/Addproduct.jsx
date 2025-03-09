@@ -40,7 +40,6 @@ export default function AddProductPopup({ onClose, onAddProduct }) {
         credentials: "include",
       });
 
-      console.log(jsonData);
       if (!response.ok) throw new Error("Failed to add product");
 
       alert("✅ เพิ่มสินค้าลงระบบเรียบร้อย!");
