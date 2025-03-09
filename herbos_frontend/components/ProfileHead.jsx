@@ -68,7 +68,7 @@ export default function Sidebar() {
                   onClick={logout}
                   className="mt-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
                 >
-                  Logout
+                  ออกจากระบบ
                 </button>
               </div>
             )}
