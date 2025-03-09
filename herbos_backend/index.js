@@ -6,7 +6,6 @@ import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 import mysql from "mysql2/promise";
 import crypto from "crypto";
-import qrcode from "qrcode";
 
 const PORT = 3100;
 const REFRESH_SECRET =
@@ -45,17 +44,7 @@ app.use((req, res, next) => {
 const generateUserSecretKey = () => {
   return crypto.randomBytes(64).toString("hex");
 };
-app.get("/viewproduct", async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const [results] = await connection.query("SELECT * FROM products");
-    connection.release();
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Database query error" });
-  }
-});
+
 app.post("/register", async (req, res) => {
   const userData = {
     firstname: req.body.firstname,
@@ -224,22 +213,6 @@ app.get("/category", async (req, res) => {
   }
 });
 
-app.get("/selFromCategory", async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const [results] = await connection.query(
-      "SELECT * FROM products WHERE category_id = ?",
-      [req.body.category]
-    );
-    connection.release();
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// Add this to your index.js backend file
 app.get("/ingredients", async (req, res) => {
   try {
     const customIds = req.query.custom_id.split(",");
@@ -387,8 +360,6 @@ app.post("/addproduct", verifyToken, async (req, res) => {
 app.post("/orders", verifyToken, async (req, res) => {
   const { order_status, total_amount, payment_status } = req.body;
 
-  console.log(order_status, total_amount, payment_status)
-
   try {
     const connection = await pool.getConnection();
 
@@ -416,7 +387,6 @@ app.post("/orders", verifyToken, async (req, res) => {
   }
 });
 
-// ดึงข้อมูลคำสั่งซื้อทั้งหมด
 app.get("/orders", async (req, res) => {
   try {
     const connection = await pool.getConnection();
@@ -430,7 +400,7 @@ app.get("/orders", async (req, res) => {
         orders.total_amount
       FROM orders
       LEFT JOIN users ON orders.user_id = users.id
-      ORDER BY orders.order_date DESC
+      ORDER BY orders.order_id DESC
     `);
     connection.release();
     res.json(results);
@@ -440,7 +410,6 @@ app.get("/orders", async (req, res) => {
   }
 });
 
-// อัพเดทสถานะคำสั่งซื้อ
 app.put("/orders/:orderId/status", async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
@@ -459,7 +428,6 @@ app.put("/orders/:orderId/status", async (req, res) => {
   }
 });
 
-// ลบคำสั่งซื้อ
 app.delete("/orders/:orderId", async (req, res) => {
   const { orderId } = req.params;
 
@@ -479,31 +447,6 @@ app.delete("/orders/:orderId", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// เพิ่มรายการสินค้าลงในคำสั่งซื้อ
-app.post("/order-items", verifyToken, async (req, res) => {
-  const { order_id, product_id, quantity, price } = req.body;
-
-  // ตรวจสอบข้อมูลที่จำเป็น
-  if (!order_id || !product_id || !quantity || !price) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  try {
-    const connection = await pool.getConnection();
-
-    // คำสั่ง SQL สำหรับการเพิ่มรายการสินค้า
-    const query =
-      "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
-    await connection.query(query, [order_id, product_id, quantity, price]);
-
-    connection.release();
-    res.status(201).json({ message: "Order item added successfully" });
-  } catch (err) {
-    console.error("Error inserting order item:", err);
-    res.status(500).json({ error: "Database error" });
   }
 });
 
@@ -534,35 +477,6 @@ app.get("/allCart", verifyToken, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-app.post("/generate-promptpay", async (req, res) => {
-  const { accountNumber, amount } = req.body;
-
-  if (!accountNumber) {
-    return res.status(400).json({ message: "Account number is required" });
-  }
-
-  try {
-    const formatAccount = accountNumber.replace(/-/g, "");
-    const serviceCode = "000201";
-    const promptPayPrefix = "010212";
-    const accountData = `2937A000000677010111${formatAccount}`;
-    const currency = "530376";
-    const amountData = amount
-      ? `54${parseFloat(amount).toFixed(2).replace(".", "")}`
-      : "";
-    const countryCode = "5802TH";
-    const checksumPlaceholder = "6304";
-
-    const payload = `${serviceCode}${promptPayPrefix}${accountData}${currency}${amountData}${countryCode}${checksumPlaceholder}`;
-    const qrCode = await qrcode.toDataURL(payload);
-
-    res.json({ qrCode });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to generate QR Code" });
   }
 });
 

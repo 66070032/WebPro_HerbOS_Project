@@ -42,17 +42,22 @@ export default function PaymentPage() {
       const payAmount = dataPayment.amount.amount;
       if (dataPayment.receiver.bank.short === 'SCB' && dataPayment.receiver.account.name.th === 'นาย เจตนิพัทธ์ ท') {
         if (parseFloat(payAmount) === parseFloat(amount)) {
-            alert('✅ ชำระเงินเรียบร้อย!');
-            await fetchWithAuth('http://localhost:3100/orders', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              credentials: 'include',
-              body: JSON.stringify({ order_status: "จัดส่งแล้ว", total_amount: payAmount, payment_status: "ชำระเงินแล้ว" })
-            })
-            router.push('/'); // นำทางไปยังหน้าสำเร็จ
-          } else {
+          await fetchWithAuth('http://localhost:3100/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ order_status: "จัดส่งแล้ว", total_amount: payAmount, payment_status: "ชำระเงินแล้ว" })
+          })
+          alert('✅ ชำระเงินเรียบร้อย!');
+          await fetchWithAuth('http://localhost:3100/paymentSuccess', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          })
+          router.push('/'); // นำทางไปยังหน้าสำเร็จ
+        } else {
             alert('❌ ยอดเงินไม่ตรง กรุณาตรวจสอบอีกครั้ง!');
-          }
+        }
       } else {
         alert('❌ ชื่อบัญชีไม่ตรง กรุณาตรวจสอบอีกครั้ง!');
       }
