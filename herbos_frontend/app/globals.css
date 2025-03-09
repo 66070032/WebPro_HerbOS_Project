@@ -15,4 +15,22 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-header), var(--font-kanit), sans-serif;
   }
+
+  span[font="header"] {
+    font-family: var(--font-header), sans-serif;
+  }
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .animate-scroll {
+    display: flex;
+    gap: 2rem;
+    animation: scroll 30s linear infinite;
+  }
 }

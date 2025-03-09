@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import LoopBar from "../components/LoopBar";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -26,7 +27,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100">
       <Navbar />
-      
+      <LoopBar />
       <div className="container mx-auto px-4 py-12">
         {/* landingpage */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-20">
