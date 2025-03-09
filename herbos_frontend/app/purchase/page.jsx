@@ -210,10 +210,7 @@ export default function Purchase() {
         </div>
 
         <div className="bg-white p-4 flex justify-center items-center rounded">
-          <button
-            onClick={handleCheckout} 
-            className="w-1/2 bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600"
-          >
+          <button className="w-1/2 bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600">
             สั่งสินค้า
           </button>
         </div>
