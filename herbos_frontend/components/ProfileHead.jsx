@@ -83,9 +83,6 @@ export default function Sidebar() {
             <li className="w-full text-center hover:bg-gray-700 p-2 rounded">
               <Link href="/profile/editpassword">Security</Link>
             </li>
-            <li className="w-full text-center hover:bg-gray-700 p-2 rounded text-red-400">
-              <button onClick={logout}>Logout</button>
-            </li>
           </ul>
         </nav>
       </div>

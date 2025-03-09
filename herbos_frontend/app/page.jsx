@@ -9,18 +9,14 @@ import Footer from "../components/Footer";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        setIsLoading(true);
         const data = await fetchWithAuth("http://localhost:3100/profile");
         setUser(data);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
@@ -31,8 +27,8 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100">
       <Navbar />
       
-      <main className="container mx-auto px-4 py-12">
-        {/* Hero Section */}
+      <div className="container mx-auto px-4 py-12">
+        {/* landingpage */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-20">
           <div className="flex flex-col md:w-1/2 space-y-6">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-purple-800 to-green-600">
@@ -91,35 +87,12 @@ export default function Dashboard() {
                 คุณสามารถออกแบบผลิตภัณฑ์สมุนไพรได้ตามต้องการ 
                 เลือกส่วนผสม ปริมาณ และรูปแบบที่เหมาะกับคุณ
               </p>
-              <div className="pt-4">
-                <Link
-                  href="/customize"
-                  className="inline-block px-6 py-3 text-white font-medium bg-lime-300 rounded-3xl"
-                >
-                  เริ่มปรับแต่งเลย
-                </Link>
-              </div>
             </div>
           </div>
         </div>
-
-        {user && (
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-xl font-semibold text-purple-800">
-              สวัสดี, {user.name}
-            </h3>
-            <p className="text-purple-700">
-              ยินดีต้อนรับกลับมา! ตรวจสอบข้อเสนอพิเศษสำหรับคุณได้ที่นี่
-            </p>
-          </div>
-        )}
         
-        {isLoading && (
-          <div className="text-center py-4">
-            <p className="text-purple-600">กำลังโหลด...</p>
-          </div>
-        )}
-      </main>
+
+      </div>
       <Footer />
     </div>
   );

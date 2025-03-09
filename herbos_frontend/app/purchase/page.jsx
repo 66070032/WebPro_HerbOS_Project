@@ -11,7 +11,7 @@ export default function Purchase() {
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [subTotal, setSubTotal] = useState(0);
   const router = useRouter();
-  const shippingCost = 30;
+
 
   useEffect(() => {
     Promise.all([
@@ -143,15 +143,15 @@ export default function Purchase() {
   }, []);
 
   const handleCheckout = async () => {
-    router.push('/purchase/payment?amount='+calculateTotal());
-  }
+    router.push("/purchase/payment?amount=" + calculateTotal());
+  };
 
   const back = () => {
     router.push("/viewproduct");
   };
 
   const calculateTotal = () => {
-    return subTotal + shippingCost;
+    return subTotal
   };
 
   return (
@@ -202,10 +202,7 @@ export default function Purchase() {
             <span>ยอดรวม</span>
             <span>฿{Number(subTotal).toFixed(2)}</span>
           </div>
-          <div className="flex justify-between mt-2 text-lg">
-            <span>ค่าจัดส่ง</span>
-            <span>฿{shippingCost.toFixed(2)}</span>
-          </div>
+
           <div className="flex justify-between mt-2 font-bold text-lg">
             <span>ยอดชำระทั้งหมด</span>
             <span>฿{Number(calculateTotal()).toFixed(2)}</span>
@@ -213,7 +210,10 @@ export default function Purchase() {
         </div>
 
         <div className="bg-white p-4 flex justify-center items-center rounded">
-          <button className="w-1/2 bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600">
+          <button
+            onClick={handleCheckout} 
+            className="w-1/2 bg-blue-500 text-white py-2 rounded-lg text-base font-semibold hover:bg-blue-600"
+          >
             สั่งสินค้า
           </button>
         </div>

@@ -11,7 +11,6 @@ const product_page = () => {
   const [isCustom, setIsCustom] = useState(false);
 
   useEffect(() => {
-    // ทำการเช็คก่อนว่าเป็นสินค้าปกติหรือไม่
     fetch(`http://localhost:3100/products/${id}`)
       .then((res) => res.json())
       .then((data) => {

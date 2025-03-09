@@ -42,7 +42,7 @@ export default function PaymentPage() {
       if (dataPayment.receiver.bank.short === 'SCB' && dataPayment.receiver.account.name.th === 'นาย เจตนิพัทธ์ ท') {
         if (parseFloat(payAmount) === parseFloat(amount)) {
             alert('✅ ชำระเงินเรียบร้อย!');
-            // router.push('/success'); // นำทางไปยังหน้าสำเร็จ
+            router.push('/success'); 
           } else {
             alert('❌ ยอดเงินไม่ตรง กรุณาตรวจสอบอีกครั้ง!');
           }

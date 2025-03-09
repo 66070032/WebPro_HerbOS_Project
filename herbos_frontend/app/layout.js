@@ -2,14 +2,12 @@ import { Geist, Geist_Mono, Kanit } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-// ✅ Import ฟอนต์ Kanit
 const kanit = Kanit({
-  weight: ["300", "400", "700"], // สามารถเลือกน้ำหนักที่ต้องการได้
+  weight: ["300", "400", "700"],
   subsets: ["latin", "thai"],
-  variable: "--font-kanit", // สร้างตัวแปร CSS
+  variable: "--font-kanit",
 });
 
-// ✅ Import ฟอนต์ไทยจากไฟล์ภายในโปรเจค
 const headerfont = localFont({
   src: [
     {
@@ -29,7 +27,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="th" className={`${kanit.variable} ${headerfont.variable}`}>
-      <body className={`font-sans antialiased`}>
+      <body className="font-kanit antialiased">
         {children}
       </body>
     </html>

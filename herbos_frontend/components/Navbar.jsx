@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Cart from "./Cart";
 import { CircleUser } from "lucide-react";
+import { Truck } from 'lucide-react';
 import { useState } from "react";
 
 const Navbar = () => {
@@ -13,11 +14,6 @@ const Navbar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
   
-  const profileMenu = () => {
-    // ฟังก์ชันว่างสำหรับการใช้งานในอนาคต
-  };
-
-  // ฟังก์ชันเพื่อตรวจสอบว่าลิงก์เป็นลิงก์ที่กำลังใช้งานอยู่หรือไม่
   const isActive = (path) => {
     return pathname === path;
   };
@@ -67,23 +63,14 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link
-                href="/pricing"
-                className={`block py-2 px-3 md:p-0 rounded md:bg-transparent ${
-                  isActive('/pricing') 
-                    ? 'text-lime-200 md:text-lime-700 bg-lime-700 md:bg-transparent' 
-                    : 'text-black md:text-white hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-lime-700 dark:text-white md:dark:hover:text-lime-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent'
-                }`}
-              >
-                Pricing
-              </Link>
-            </li>
-            <li>
               <Cart />
             </li>
             <li>
+              <Truck className="text-white"/>
+            </li>
+            <li>
               <Link 
-                href="/profile"
+                href="/profile/editprofile"
                 className={`block py-2 px-3 md:p-0 rounded md:bg-transparent ${
                   isActive('/profile') 
                     ? 'text-lime-200 md:text-lime-700' 

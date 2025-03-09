@@ -144,7 +144,7 @@ app.post("/login", async (req, res) => {
 
     res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: false });
 
-    res.json({ accessToken });
+    res.json({ accessToken, role: user[0].role });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -377,6 +377,88 @@ app.post("/addproduct", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+// สร้างคำสั่งซื้อ
+app.post("/orders", verifyToken, async (req, res) => {
+  const { order_status, total_amount, payment_status } = req.body;
+
+  // ตรวจสอบข้อมูลที่จำเป็น
+  if (!order_status || !total_amount || !payment_status) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  // ตรวจสอบว่า payment_status เป็น "ชำระเงินแล้ว"
+  if (payment_status !== "ชำระเงินแล้ว") {
+    return res.status(400).json({ error: "ยังไม่ชำระ" }); // "Not paid"
+  }
+
+  try {
+    const connection = await pool.getConnection();
+
+    // คำสั่ง SQL สำหรับการบันทึกคำสั่งซื้อ
+    const query =
+      "INSERT INTO orders (user_id, order_status, total_amount, payment_status) VALUES (?, ?, ?, ?)";
+    const [result] = await connection.query(query, [
+      req.user.userId,
+      order_status,
+      total_amount,
+      payment_status,
+    ]);
+
+    connection.release();
+    res
+      .status(201)
+      .json({
+        order_id: result.insertId,
+        message: "Order created successfully",
+      });
+  } catch (err) {
+    console.error("Error inserting order:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+// ดึงข้อมูลคำสั่งซื้อทั้งหมดที่ชำระเงินแล้ว
+app.get("/orders", verifyToken, async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+
+    // คำสั่ง SQL สำหรับดึงข้อมูลคำสั่งซื้อ
+    const [orders] = await connection.query(
+      "SELECT * FROM orders WHERE payment_status = 'ชำระเงินแล้ว'"
+    );
+
+    connection.release();
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// เพิ่มรายการสินค้าลงในคำสั่งซื้อ
+app.post("/order-items", verifyToken, async (req, res) => {
+  const { order_id, product_id, quantity, price } = req.body;
+
+  // ตรวจสอบข้อมูลที่จำเป็น
+  if (!order_id || !product_id || !quantity || !price) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const connection = await pool.getConnection();
+
+    // คำสั่ง SQL สำหรับการเพิ่มรายการสินค้า
+    const query =
+      "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)";
+    await connection.query(query, [order_id, product_id, quantity, price]);
+
+    connection.release();
+    res.status(201).json({ message: "Order item added successfully" });
+  } catch (err) {
+    console.error("Error inserting order item:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
 
 app.delete("/cart/:id", verifyToken, async (req, res) => {
   try {
@@ -412,26 +494,28 @@ app.post("/generate-promptpay", async (req, res) => {
   const { accountNumber, amount } = req.body;
 
   if (!accountNumber) {
-      return res.status(400).json({ message: "Account number is required" });
+    return res.status(400).json({ message: "Account number is required" });
   }
 
   try {
-      const formatAccount = accountNumber.replace(/-/g, '');
-      const serviceCode = '000201';
-      const promptPayPrefix = '010212';
-      const accountData = `2937A000000677010111${formatAccount}`;
-      const currency = '530376';
-      const amountData = amount ? `54${parseFloat(amount).toFixed(2).replace('.', '')}` : '';
-      const countryCode = '5802TH';
-      const checksumPlaceholder = '6304';
+    const formatAccount = accountNumber.replace(/-/g, "");
+    const serviceCode = "000201";
+    const promptPayPrefix = "010212";
+    const accountData = `2937A000000677010111${formatAccount}`;
+    const currency = "530376";
+    const amountData = amount
+      ? `54${parseFloat(amount).toFixed(2).replace(".", "")}`
+      : "";
+    const countryCode = "5802TH";
+    const checksumPlaceholder = "6304";
 
-      const payload = `${serviceCode}${promptPayPrefix}${accountData}${currency}${amountData}${countryCode}${checksumPlaceholder}`;
-      const qrCode = await qrcode.toDataURL(payload);
+    const payload = `${serviceCode}${promptPayPrefix}${accountData}${currency}${amountData}${countryCode}${checksumPlaceholder}`;
+    const qrCode = await qrcode.toDataURL(payload);
 
-      res.json({ qrCode });
+    res.json({ qrCode });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Failed to generate QR Code" });
+    console.error(error);
+    res.status(500).json({ message: "Failed to generate QR Code" });
   }
 });
 
