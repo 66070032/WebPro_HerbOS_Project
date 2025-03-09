@@ -24,13 +24,13 @@
       transform: translateX(0);
     }
     to {
-      transform: translateX(-100%);
+      transform: translateX(-500%);
     }
   }
   
   .animate-scroll {
     display: flex;
     gap: 2rem;
-    animation: scroll 30s linear infinite;
+    animation: scroll 180s linear infinite;
   }
 }
