@@ -44,7 +44,7 @@ export default function Orders() {
                 ) : (
                     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {orders.map((order, index) => (
-                            <div key={order.id} className="p-6 border rounded-lg shadow-lg bg-white transition duration-300 hover:shadow-xl">
+                            <div key={order.id || `order-${index}`} className="p-6 border rounded-lg shadow-lg bg-white transition duration-300 hover:shadow-xl">
                                 <h2 className="text-xl font-semibold text-blue-600 mb-4">
                                     Order ID: {order.order_id}
                                 </h2>
