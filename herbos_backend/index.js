@@ -137,7 +137,13 @@ app.post("/login", async (req, res) => {
       { expiresIn: "15m" }
     );
     const refreshToken = jwt.sign(
-      { userId: user[0].id, username: userData.username },
+      {
+        userId: user[0].id,
+        username: userData.username,
+        email: user[0].email,
+        phone: user[0].phone,
+        role: user[0].role,
+      },
       REFRESH_SECRET,
       { expiresIn: "7d" }
     );

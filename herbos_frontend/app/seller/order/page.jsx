@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import SellerTab from "../../../components/SellerTab";
 
 export default function OrdersAdmin() {
+  const userData = localStorage.getItem("accessToken");
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
@@ -49,6 +50,9 @@ export default function OrdersAdmin() {
 
   // ดึงข้อมูลคำสั่งซื้อจากฐานข้อมูล
   useEffect(() => {
+    if (userData.role !== 'admin') {
+      window.location.href = '/';
+    }
     const fetchOrders = async () => {
       try {
         const response = await fetch("http://localhost:3100/orders");

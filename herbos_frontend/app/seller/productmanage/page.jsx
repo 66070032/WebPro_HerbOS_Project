@@ -7,8 +7,12 @@ import Image from "next/image";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
+  const userData = localStorage.getItem("accessToken");
   
   useEffect(() => {
+    if (userData.role !== 'admin') {
+      window.location.href = '/';
+    }
       fetch('http://localhost:3100/products')
       .then((res) => res.json())
       .then((data) => setProducts(data))
