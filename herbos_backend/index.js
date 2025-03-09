@@ -405,32 +405,78 @@ app.post("/orders", verifyToken, async (req, res) => {
     ]);
 
     connection.release();
-    res
-      .status(201)
-      .json({
-        order_id: result.insertId,
-        message: "Order created successfully",
-      });
+    res.status(201).json({
+      order_id: result.insertId,
+      message: "Order created successfully",
+    });
   } catch (err) {
     console.error("Error inserting order:", err);
     res.status(500).json({ error: "Database error" });
   }
 });
 
-// ดึงข้อมูลคำสั่งซื้อทั้งหมดที่ชำระเงินแล้ว
-app.get("/orders", verifyToken, async (req, res) => {
+// ดึงข้อมูลคำสั่งซื้อทั้งหมด
+app.get("/orders", async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(`
+      SELECT 
+        orders.order_id,
+        users.username,
+        orders.order_date,
+        orders.order_status,
+        orders.payment_status,
+        orders.total_amount
+      FROM orders
+      LEFT JOIN users ON orders.user_id = users.id
+      ORDER BY orders.order_date DESC
+    `);
+    connection.release();
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// อัพเดทสถานะคำสั่งซื้อ
+app.put("/orders/:orderId/status", async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const connection = await pool.getConnection();
+    await connection.query(
+      "UPDATE orders SET order_status = ? WHERE order_id = ?",
+      [status, orderId]
+    );
+    connection.release();
+    res.json({ message: "Order status updated successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// ลบคำสั่งซื้อ
+app.delete("/orders/:orderId", async (req, res) => {
+  const { orderId } = req.params;
+
   try {
     const connection = await pool.getConnection();
 
-    // คำสั่ง SQL สำหรับดึงข้อมูลคำสั่งซื้อ
-    const [orders] = await connection.query(
-      "SELECT * FROM orders WHERE payment_status = 'ชำระเงินแล้ว'"
-    );
+    // ลบรายการสินค้าในคำสั่งซื้อก่อน (เพื่อรักษา referential integrity)
+    await connection.query("DELETE FROM order_items WHERE order_id = ?", [
+      orderId,
+    ]);
+
+    // ลบคำสั่งซื้อ
+    await connection.query("DELETE FROM orders WHERE order_id = ?", [orderId]);
 
     connection.release();
-    res.json(orders);
-  } catch (error) {
-    console.error(error);
+    res.json({ message: "Order deleted successfully" });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -519,17 +565,20 @@ app.post("/generate-promptpay", async (req, res) => {
   }
 });
 
-app.post('/paymentSuccess', verifyToken,async (req, res) => {
+app.post("/paymentSuccess", verifyToken, async (req, res) => {
   try {
     const connection = await pool.getConnection();
-    const [results] = await connection.query('DELETE FROM `user_cart` WHERE username = ?', [req.user.username]);
+    const [results] = await connection.query(
+      "DELETE FROM `user_cart` WHERE username = ?",
+      [req.user.username]
+    );
     connection.release();
     res.send(results);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    res.status(500).json({ message: "Internal Server Error" });
   }
-})
+});
 
 try {
   console.clear();
