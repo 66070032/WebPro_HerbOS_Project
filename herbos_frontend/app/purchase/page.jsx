@@ -12,7 +12,6 @@ export default function Purchase() {
   const [subTotal, setSubTotal] = useState(0);
   const router = useRouter();
 
-
   useEffect(() => {
     Promise.all([
       fetchWithAuth("http://localhost:3100/allCart", {

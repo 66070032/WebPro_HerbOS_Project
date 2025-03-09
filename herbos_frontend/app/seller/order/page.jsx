@@ -2,6 +2,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import SellerTab from "../../../components/SellerTab";
+import { fetchWithAuth } from "../../utils/auth";
 
 export default function OrdersAdmin() {
   const userData = localStorage.getItem("accessToken");
@@ -50,9 +51,11 @@ export default function OrdersAdmin() {
 
   // ดึงข้อมูลคำสั่งซื้อจากฐานข้อมูล
   useEffect(() => {
-    if (userData.role !== 'admin') {
-      window.location.href = '/';
-    }
+    fetchWithAuth('http://localhost:3100/isAdmin').then((res) => {
+          if(!res) {
+            window.location.href = '/';
+          }
+        }).catch((err) => console.error('Error:', err));
     const fetchOrders = async () => {
       try {
         const response = await fetch("http://localhost:3100/orders");
