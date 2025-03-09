@@ -34,7 +34,7 @@ export default function PaymentPage() {
 
       const response = await axios.post('https://developer.easyslip.com/api/v1/verify', formData, {
         headers: {
-          Authorization: 'Bearer 6424ba55-b9ca-48e8-9bb2-1a60bca9e47f',
+          Authorization: 'Bearer 2a93891c-2b88-4afa-92f2-cf99d5c474a2',
         },
       });
       
@@ -43,7 +43,13 @@ export default function PaymentPage() {
       if (dataPayment.receiver.bank.short === 'SCB' && dataPayment.receiver.account.name.th === 'นาย เจตนิพัทธ์ ท') {
         if (parseFloat(payAmount) === parseFloat(amount)) {
             alert('✅ ชำระเงินเรียบร้อย!');
-            // router.push('/success'); // นำทางไปยังหน้าสำเร็จ
+            await fetchWithAuth('http://localhost:3100/orders', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify({ order_status: "จัดส่งแล้ว", total_amount: payAmount, payment_status: "ชำระเงินแล้ว" })
+            })
+            router.push('/'); // นำทางไปยังหน้าสำเร็จ
           } else {
             alert('❌ ยอดเงินไม่ตรง กรุณาตรวจสอบอีกครั้ง!');
           }

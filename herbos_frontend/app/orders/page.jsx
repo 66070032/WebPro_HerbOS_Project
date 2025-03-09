@@ -43,13 +43,10 @@ export default function Orders() {
                     <p className="text-xl text-gray-600">No orders found.</p>
                 ) : (
                     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {orders.map((order) => (
-                            <div
-                                key={order.id}
-                                className="p-6 border rounded-lg shadow-lg bg-white transition duration-300 hover:shadow-xl"
-                            >
+                        {orders.map((order, index) => (
+                            <div key={order.id} className="p-6 border rounded-lg shadow-lg bg-white transition duration-300 hover:shadow-xl">
                                 <h2 className="text-xl font-semibold text-blue-600 mb-4">
-                                    Order ID: {order.id}
+                                    Order ID: {order.order_id}
                                 </h2>
                                 <div className="text-gray-700 mb-2">
                                     <strong>Status:</strong> {order.order_status}
@@ -61,7 +58,7 @@ export default function Orders() {
                                     <strong>Payment Status:</strong> {order.payment_status}
                                 </div>
                                 <div className="text-gray-700">
-                                    <strong>Order Date:</strong> {new Date(order.created_at).toLocaleDateString()}
+                                    <strong>Order Date:</strong> {new Date(order.order_date).toLocaleDateString()}
                                 </div>
                             </div>
                         ))}

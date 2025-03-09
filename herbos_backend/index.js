@@ -381,28 +381,23 @@ app.post("/addproduct", verifyToken, async (req, res) => {
 app.post("/orders", verifyToken, async (req, res) => {
   const { order_status, total_amount, payment_status } = req.body;
 
-  // ตรวจสอบข้อมูลที่จำเป็น
-  if (!order_status || !total_amount || !payment_status) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  // ตรวจสอบว่า payment_status เป็น "ชำระเงินแล้ว"
-  if (payment_status !== "ชำระเงินแล้ว") {
-    return res.status(400).json({ error: "ยังไม่ชำระ" }); // "Not paid"
-  }
+  console.log(order_status, total_amount, payment_status)
 
   try {
     const connection = await pool.getConnection();
 
     // คำสั่ง SQL สำหรับการบันทึกคำสั่งซื้อ
     const query =
-      "INSERT INTO orders (user_id, order_status, total_amount, payment_status) VALUES (?, ?, ?, ?)";
+      "INSERT INTO orders (user_id, username, order_status, total_amount, payment_status) VALUES (?, ?, ?, ?, ?)";
     const [result] = await connection.query(query, [
       req.user.userId,
+      req.user.username,
       order_status,
       total_amount,
       payment_status,
     ]);
+
+    console.log(result)
 
     connection.release();
     res.status(201).json({
