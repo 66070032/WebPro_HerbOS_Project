@@ -261,7 +261,7 @@ export default function Cart() {
 
   // ฟังก์ชันเปิด/ปิดการแสดงตะกร้า
   const toggleCartVisibility = () => {
-    updateCart(); // อัพเดทข้อมูลตะกร้าก่อนแสดง
+    updateCart();
     setIsCartVisible(!isCartVisible);
   };
 

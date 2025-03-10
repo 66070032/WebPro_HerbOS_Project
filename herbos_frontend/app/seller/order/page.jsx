@@ -58,8 +58,8 @@ export default function OrdersAdmin() {
         }).catch((err) => console.error('Error:', err));
     const fetchOrders = async () => {
       try {
-        const data = await fetchWithAuth("http://localhost:3100/orders");
-        // const data = await response.json();
+        const response = await fetch("http://localhost:3100/orders");
+        const data = await response.json();
         setOrders(data);
         setLoading(false);
       } catch (error) {

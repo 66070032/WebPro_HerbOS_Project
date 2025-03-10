@@ -212,6 +212,22 @@ app.get("/category", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+app.get("/products/category/:categoryId", async (req, res) => {
+  const categoryId = req.params.categoryId;
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(
+      "SELECT * FROM products WHERE category_id = ?",
+      [categoryId]
+    );
+    connection.release();
+    
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 app.get("/ingredients", async (req, res) => {
   try {
@@ -397,8 +413,7 @@ app.get("/orders", verifyToken, async (req, res) => {
         orders.total_amount
       FROM orders
       LEFT JOIN users ON orders.user_id = users.id
-      WHERE orders.user_id = ?
-      ORDER BY orders.order_id DESC
+      ORDER BY orders.order_id ASC
     `,
       [req.user.userId]
     );
