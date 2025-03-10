@@ -397,7 +397,7 @@ app.get("/orders", verifyToken, async (req, res) => {
         orders.total_amount
       FROM orders
       LEFT JOIN users ON orders.user_id = users.id
-      ORDER BY orders.order_id DESC
+      ORDER BY orders.order_id ASC
     `,
       [req.user.userId]
     );
