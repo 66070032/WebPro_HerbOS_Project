@@ -410,20 +410,55 @@ app.get("/orders", verifyToken, async (req, res) => {
         orders.order_date,
         orders.order_status,
         orders.payment_status,
-        orders.total_amount
+        orders.total_amount,
+        order_items.product_id,
+        products.name AS product_name,
+        order_items.quantity,
+        order_items.price AS product_price
       FROM orders
       LEFT JOIN users ON orders.user_id = users.id
+      LEFT JOIN order_items ON orders.order_id = order_items.order_id
+      LEFT JOIN products ON order_items.product_id = products.id
       ORDER BY orders.order_id ASC
-    `,
-      [req.user.userId]
+    `
     );
     connection.release();
-    res.json(results);
+
+    // จัดกลุ่มข้อมูลตาม order_id
+    const orders = results.reduce((acc, row) => {
+      const { order_id, username, order_date, order_status, payment_status, total_amount, product_id, product_name, quantity, product_price } = row;
+
+      if (!acc[order_id]) {
+        acc[order_id] = {
+          order_id,
+          username,
+          order_date,
+          order_status,
+          payment_status,
+          total_amount,
+          items: [],
+        };
+      }
+
+      if (product_id) {
+        acc[order_id].items.push({
+          product_id,
+          product_name,
+          quantity,
+          product_price,
+        });
+      }
+
+      return acc;
+    }, {});
+
+    res.json(Object.values(orders));
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 app.put("/orders/:orderId/status", async (req, res) => {
   const { orderId } = req.params;

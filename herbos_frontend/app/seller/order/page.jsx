@@ -1,6 +1,6 @@
 // pages/admin/orders.js
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import SellerTab from "../../../components/SellerTab";
 import { fetchWithAuth } from "../../utils/auth";
 
@@ -51,11 +51,13 @@ export default function OrdersAdmin() {
 
   // ดึงข้อมูลคำสั่งซื้อจากฐานข้อมูล
   useEffect(() => {
-    fetchWithAuth('http://localhost:3100/isAdmin').then((res) => {
-          if(!res) {
-            window.location.href = '/';
-          }
-        }).catch((err) => console.error('Error:', err));
+    fetchWithAuth("http://localhost:3100/isAdmin")
+      .then((res) => {
+        if (!res) {
+          window.location.href = "/";
+        }
+      })
+      .catch((err) => console.error("Error:", err));
     const fetchOrders = async () => {
       try {
         const data = await fetchWithAuth("http://localhost:3100/orders");
@@ -222,43 +224,65 @@ export default function OrdersAdmin() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredOrders.map((order) => (
-                  <tr key={order.order_id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {order.order_id}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(order.order_date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {order.username}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      ฿{Number(order.total_amount).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                          order.order_status
-                        )}`}
-                      >
-                        {order.order_status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => setSelectedOrder(order)}
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                      >
-                        แก้ไข
-                      </button>
-                      <button
-                        onClick={() => deleteOrder(order.order_id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        ลบ
-                      </button>
-                    </td>
-                  </tr>
+                  <React.Fragment key={order.order_id}>
+                    {/* แถวหลักของออเดอร์ */}
+                    <tr className="hover:bg-gray-50 bg-gray-100">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {order.order_id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDate(order.order_date)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {order.username}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ฿{Number(order.total_amount).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
+                            order.order_status
+                          )}`}
+                        >
+                          {order.order_status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => setSelectedOrder(order)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                        >
+                          แก้ไข
+                        </button>
+                        <button
+                          onClick={() => deleteOrder(order.order_id)}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          ลบ
+                        </button>
+                      </td>
+                    </tr>
+
+                    {/* แถวแสดงรายการสินค้า */}
+                    {order.items.map((item) => (
+                      <tr key={item.product_id} className="border-t bg-white">
+                        <td
+                          colSpan={2}
+                          className="px-6 py-2 text-sm text-gray-600"
+                        >
+                          └ {item.product_name}
+                        </td>
+                        <td className="px-6 py-2 text-sm text-gray-600">
+                          จำนวน: {item.quantity}
+                        </td>
+                        <td className="px-6 py-2 text-sm text-gray-600">
+                          ฿{Number(item.product_price).toLocaleString()}
+                        </td>
+                        <td colSpan={2}></td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

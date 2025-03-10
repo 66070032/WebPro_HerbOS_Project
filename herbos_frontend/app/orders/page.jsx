@@ -55,7 +55,7 @@ export default function Orders() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {orders.map((order, index) => (
               <div
-                key={order.id || `order-${index}`}
+                key={order.order_id || `order-${index}`}
                 className="bg-white p-6 rounded-lg shadow-lg transition duration-300 hover:shadow-xl"
               >
                 <h2 className="text-xl font-semibold text-blue-600 mb-4">
@@ -65,7 +65,8 @@ export default function Orders() {
                   <strong>สถานะ:</strong> {order.order_status}
                 </div>
                 <div className="text-gray-700 mb-2">
-                  <strong>ยอดรวม:</strong> {order.total_amount} บาท
+                  <strong>ยอดรวม:</strong> ฿
+                  {Number(order.total_amount).toLocaleString()}
                 </div>
                 <div className="text-gray-700 mb-2">
                   <strong>สถานะการชำระเงิน:</strong> {order.payment_status}
