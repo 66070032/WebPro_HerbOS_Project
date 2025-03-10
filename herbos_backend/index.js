@@ -383,10 +383,11 @@ app.post("/orders", verifyToken, async (req, res) => {
   }
 });
 
-app.get("/orders", async (req, res) => {
+app.get("/orders", verifyToken, async (req, res) => {
   try {
     const connection = await pool.getConnection();
-    const [results] = await connection.query(`
+    const [results] = await connection.query(
+      `
       SELECT 
         orders.order_id,
         users.username,
@@ -396,8 +397,11 @@ app.get("/orders", async (req, res) => {
         orders.total_amount
       FROM orders
       LEFT JOIN users ON orders.user_id = users.id
+      WHERE orders.user_id = ?
       ORDER BY orders.order_id DESC
-    `);
+    `,
+      [req.user.userId]
+    );
     connection.release();
     res.json(results);
   } catch (err) {
@@ -491,7 +495,7 @@ app.post("/paymentSuccess", verifyToken, async (req, res) => {
   }
 });
 
-app.get('/isAdmin', verifyToken, async (req, res) => {
+app.get("/isAdmin", verifyToken, async (req, res) => {
   try {
     const connection = await pool.getConnection();
     const [results] = await connection.query(
@@ -499,12 +503,12 @@ app.get('/isAdmin', verifyToken, async (req, res) => {
       [req.user.userId]
     );
     connection.release();
-    return results[0].role === 'admin' ? res.json(true) : res.json(false);
+    return results[0].role === "admin" ? res.json(true) : res.json(false);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
-})
+});
 
 try {
   console.clear();
