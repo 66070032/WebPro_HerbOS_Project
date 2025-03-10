@@ -70,13 +70,14 @@ export default function Dashboard() {
         <div className="bg-gradient-to-r from-green-50 to-purple-50 rounded-3xl shadow-xl p-8 mb-16 border border-green-200">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="md:w-1/2">
-              <div className="relative overflow-hidden rounded-xl border-4 border-purple-200">
+              <div className="relative overflow-hidden rounded-xl">
                 <Image
-                  src="/images/custom.png"
+                  src="/images/blue_1_bg.png"
                   alt="ปรับแต่งสมุนไพรตามต้องการ"
                   width={600}
                   height={400}
                   className="w-full h-auto object-cover"
+                  style={{ transform: "translateY(-8%) scale(1.2)" }}
                 />
               </div>
             </div>
