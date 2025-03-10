@@ -10,7 +10,7 @@ export default function Orders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const data = await fetchWithAuth("http://localhost:3100/orders", {
+        const data = await fetchWithAuth("http://localhost:3100/user_orders", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
