@@ -10,6 +10,8 @@
 แตกไฟล์ด้วยโปรแกรมแตกไฟล์ (WinRar / WinZip / 7Zip)
 
 รันไฟล์ run.bat
+
+เข้าใช้งานเว็บไซต์ด้วย URL: http://localhost:3000
 ## Username / Password สำหรับเข้าใช้งาน
 
 - Admin mode
