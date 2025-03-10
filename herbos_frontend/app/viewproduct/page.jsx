@@ -5,6 +5,7 @@ import Image from "next/image";
 import Navbar from "../../components/Navbar";
 import Productcard from "../../components/Productcard";
 import Footer from "../../components/Footer";
+import LoopBar from "../../components/LoopBar";
 import { Search } from "lucide-react";
 
 const Product = () => {
@@ -59,6 +60,7 @@ const Product = () => {
   return (
     <div className="w-full min-h-screen bg-gradient-to-b from-[#DFC8E7] to-[#E8D8F0]">
       <Navbar />
+      <LoopBar />
 
       <div className="container mx-auto px-4 pt-28 pb-16">
         <div className="text-center mb-12">

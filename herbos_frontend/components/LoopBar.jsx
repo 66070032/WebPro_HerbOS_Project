@@ -9,7 +9,7 @@ const LoopBar = () => {
           {Array.from({ length: 360 }).map((_, index) => (
             <div key={`clone-${index}`} className="p-2 flex items-center whitespace-nowrap">
               <span className="text-lg font-bold mr-10">สมุนไพรไทยแท้ เพื่อสุขภาพที่ดีกว่า</span>
-              <Image src="/blink.svg" width={20} height={10} alt="blink" />
+              <Image src="/images/blink.svg" width={20} height={10} alt="blink" />
             </div>
           ))}
         </div>

@@ -53,13 +53,14 @@ export default function Dashboard() {
 
           <div className="md:w-1/2 mt-8">
             <div className="relative overflow-hidden rounded-xl">
-              <Image
-                src="/images/test.png"
+            <Image
+                src="/images/red_herb1.png"
                 alt="สมุนไพรคุณภาพ"
-                width={500}
-                height={300}
+                width={700}
+                height={400}
                 className="w-full h-auto object-cover"
                 priority
+                style={{ transform: "translateY(-8%) scale(1.4)" }}
               />
             </div>
           </div>
