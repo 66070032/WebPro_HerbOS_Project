@@ -52,7 +52,7 @@ const Product = () => {
     if (id === 1) return "/images/herbcate.png";
     if (id === 2) return "/images/shampoocate.png";
     if (id === 3) return "/images/soapcate.png";
-    if (id === 4) return "/images/lotion-category.png";
+    if (id === 4) return "/images/incate.png";
     return "/images/default-category.png";
   };
 
