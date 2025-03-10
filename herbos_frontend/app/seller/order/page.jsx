@@ -5,7 +5,7 @@ import SellerTab from "../../../components/SellerTab";
 import { fetchWithAuth } from "../../utils/auth";
 
 export default function OrdersAdmin() {
-  const userData = localStorage.getItem("accessToken");
+  // const userData = localStorage.getItem("accessToken");
   const formatDate = (date) => {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, "0");
